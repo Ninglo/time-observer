@@ -70,7 +70,8 @@
       energy: '',
       mood: '',
       body: '',
-      note: ''
+      note: '',
+      noteOpen: false
     };
   }
 
@@ -208,12 +209,12 @@
   }
 
   function renderClockCard(events, summary, compact) {
-    var gradient = buildClockGradient(events);
     var sizeClass = compact ? ' clock-card-compact' : '';
     return '' +
       '<section class="card clock-card' + sizeClass + '">' +
         '<div class="clock-wrap">' +
-          '<div class="clock-face' + (compact ? ' is-small' : '') + '" style="background:' + escapeHtml(gradient) + ';">' +
+          '<div class="clock-face' + (compact ? ' is-small' : '') + '">' +
+            renderClockArcs(events, compact) +
             renderClockMarkers(compact) +
             '<div class="clock-center' + (compact ? ' is-small' : '') + '">' +
               '<div class="clock-total">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
@@ -338,15 +339,17 @@
         '</div>' +
         '<div class="field-group">' +
           '<div class="field-label">活动类型</div>' +
-          '<div class="chip-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
+          '<div class="chip-grid activity-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
         '</div>' +
         (addFormState.mode === 'quick' ? renderQuickFields() : renderManualFields()) +
         renderStatusField('energy', '精力') +
         renderStatusField('mood', '情绪') +
         renderStatusField('body', '身体') +
-        '<div class="field-group">' +
-          '<div class="field-label">备注</div>' +
-          '<textarea class="text-area" id="event-note" maxlength="80" placeholder="一句话就够了"></textarea>' +
+        '<div class="field-group note-group">' +
+          '<button type="button" class="text-link" id="toggle-note">' + (addFormState.noteOpen ? '收起备注' : '添加备注') + '</button>' +
+          (addFormState.noteOpen
+            ? '<textarea class="text-area" id="event-note" maxlength="80" placeholder="一句话就够了"></textarea>'
+            : '<input type="hidden" id="event-note" value="' + escapeHtml(addFormState.note) + '">') +
         '</div>' +
         '<div class="modal-actions">' +
           '<button type="button" class="btn btn-secondary" id="cancel-add">取消</button>' +
@@ -361,7 +364,6 @@
         '<div class="field-label">刚刚这一段，持续了多久</div>' +
         '<div class="duration-grid" id="duration-grid">' + renderDurationChips() + '</div>' +
         '<input class="custom-duration" id="custom-duration" type="number" min="5" step="5" placeholder="或直接输入分钟数">' +
-        '<div class="helper-text">系统会把这一段默认贴近现在，再和今天其他时间块一起组成完整钟面。</div>' +
       '</div>';
   }
 
@@ -388,7 +390,7 @@
     return '' +
       '<div class="field-group">' +
         '<div class="field-label">' + label + '</div>' +
-        '<div class="chip-grid" id="' + group + '-grid">' + renderStatusChips(group) + '</div>' +
+        '<div class="chip-grid status-grid" id="' + group + '-grid">' + renderStatusChips(group) + '</div>' +
       '</div>';
   }
 
@@ -416,6 +418,12 @@
   function bindAddFormEvents() {
     document.getElementById('cancel-add').addEventListener('click', closeModal);
     document.getElementById('event-note').value = addFormState.note;
+    document.getElementById('toggle-note').addEventListener('click', function() {
+      addFormState.note = document.getElementById('event-note').value.trim();
+      addFormState.noteOpen = !addFormState.noteOpen;
+      setModal('记下这一段', renderAddForm());
+      bindAddFormEvents();
+    });
 
     document.querySelectorAll('[data-mode-choice]').forEach(function(node) {
       node.addEventListener('click', function() {
@@ -787,6 +795,38 @@
       segments.push(meta.color + ' ' + start + 'deg ' + end + 'deg');
     });
     return 'conic-gradient(from -90deg, ' + segments.join(', ') + ')';
+  }
+
+  function renderClockArcs(events, compact) {
+    if (!events.length) return '';
+    var radius = compact ? 39 : 41;
+    var stroke = compact ? 14 : 16;
+    var arcs = events.map(function(event) {
+      var meta = getActivityMeta(event.activity);
+      return '<path d="' + describeArc(radius, event.startMinutes, event.endMinutes) + '" style="stroke:' + meta.color + '; stroke-width:' + stroke + ';" />';
+    }).join('');
+    return '<svg class="clock-arcs' + (compact ? ' is-small' : '') + '" viewBox="0 0 100 100" aria-hidden="true">' +
+      '<circle class="clock-track" cx="50" cy="50" r="' + radius + '"></circle>' +
+      arcs +
+    '</svg>';
+  }
+
+  function describeArc(radius, startMinutes, endMinutes) {
+    var start = polarToCartesian(radius, endMinutes);
+    var end = polarToCartesian(radius, startMinutes);
+    var largeArcFlag = endMinutes - startMinutes > 720 ? 1 : 0;
+    return [
+      'M', start.x, start.y,
+      'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
+    ].join(' ');
+  }
+
+  function polarToCartesian(radius, minute) {
+    var angle = (minute / 1440) * Math.PI * 2 - Math.PI / 2;
+    return {
+      x: (50 + radius * Math.cos(angle)).toFixed(3),
+      y: (50 + radius * Math.sin(angle)).toFixed(3)
+    };
   }
 
   function parseTime(value) {
