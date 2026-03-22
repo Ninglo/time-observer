@@ -96,9 +96,9 @@ button {
 }
 
 .app-kicker {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  min-height: 16px;
+  font-size: 12px;
+  letter-spacing: 0.01em;
   color: var(--gray-500);
 }
 
@@ -126,30 +126,6 @@ button {
   border: 1px solid rgba(221, 217, 208, 0.5);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-}
-
-.hero-card {
-  padding: 18px var(--space-4);
-  background: linear-gradient(145deg, rgba(255, 254, 249, 0.95), rgba(242, 247, 236, 0.9));
-}
-
-.hero-date {
-  font-size: 13px;
-  color: var(--gray-600);
-  margin-bottom: var(--space-1);
-}
-
-.hero-title {
-  margin: 0;
-  font-size: clamp(30px, 5vw, 38px);
-  line-height: 1.1;
-  color: var(--gray-900);
-}
-
-.hero-text {
-  margin: var(--space-2) 0 0;
-  color: var(--gray-600);
-  font-size: 15px;
 }
 
 .summary-strip {
@@ -837,8 +813,9 @@ button {
   }
 
   .app-kicker {
-    font-size: 10px;
-    letter-spacing: 0.14em;
+    min-height: 15px;
+    font-size: 11px;
+    letter-spacing: 0;
   }
 
   .app-title {
@@ -856,19 +833,6 @@ button {
 
   .card {
     border-radius: 18px;
-  }
-
-  .hero-card {
-    padding: 14px 16px;
-  }
-
-  .hero-title {
-    font-size: 30px;
-    line-height: 1.08;
-  }
-
-  .hero-text {
-    font-size: 14px;
   }
 
   .summary-strip {

@@ -36,6 +36,16 @@
 
   var DURATION_OPTIONS = [15, 30, 45, 60, 90, 120, 150, 180];
   var HIGH_SPEND_LOCATIONS = ['mall', 'street', 'district'];
+  var UI_COPY = {
+    todayTitle: '已经发生',
+    todayNote: '先把做过的，轻轻放回时间里',
+    quickAction: '记一段',
+    manualAction: '补一段',
+    detailsTitle: '时间明细',
+    detailsNote: '已经经过的，都在这里',
+    plannedTitle: '接下来',
+    plannedNote: '还没开始的，也可以先留一个入口'
+  };
 
   var uiState = {
     activeView: 'today',
@@ -111,10 +121,10 @@
     var todayEvents = Storage.getTodayEvents();
     var weekDays = Storage.getWeekEvents();
     var recentOuting = Storage.getRecentOuting();
+    updateTopBar();
 
     root.innerHTML =
       '<div class="page-stack">' +
-        renderHero() +
         renderViewSwitch() +
         (uiState.activeView === 'today'
           ? renderTodayView(todayEvents, summary, recentOuting)
@@ -122,13 +132,10 @@
       '</div>';
   }
 
-  function renderHero() {
-    return '' +
-      '<section class="card hero-card">' +
-        '<div class="hero-date">' + escapeHtml(formatLongDate(new Date())) + '</div>' +
-        '<h2 class="hero-title">此刻有回声</h2>' +
-        '<p class="hero-text">允许一切自然发生</p>' +
-      '</section>';
+  function updateTopBar() {
+    var topDate = document.getElementById('top-date');
+    if (!topDate) return;
+    topDate.textContent = formatLongDate(new Date());
   }
 
   function renderMetric(label, value, className) {
@@ -151,17 +158,17 @@
     return '' +
       '<section class="section">' +
         '<div class="section-head">' +
-          '<h3 class="section-title">今日记录</h3>' +
-          '<div class="section-note">先还原时间流，再看今天长成什么样</div>' +
+          '<h3 class="section-title">' + UI_COPY.todayTitle + '</h3>' +
+          '<div class="section-note">' + UI_COPY.todayNote + '</div>' +
         '</div>' +
         renderClockCard(events, summary, false) +
         '<div class="dual-actions">' +
-          '<button class="btn btn-primary" data-action="open-add" data-mode="quick">刚做完</button>' +
-          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记</button>' +
+          '<button class="btn btn-primary" data-action="open-add" data-mode="quick">' + UI_COPY.quickAction + '</button>' +
+          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">' + UI_COPY.manualAction + '</button>' +
         '</div>' +
-        renderSummaryStrip(summary) +
+        renderPlannedSection(recentOuting) +
         renderEventList(events) +
-        renderOutingSection(recentOuting) +
+        renderSummaryStrip(summary) +
       '</section>';
   }
 
@@ -255,8 +262,8 @@
     var html =
       '<section class="section">' +
         '<div class="section-head">' +
-          '<h3 class="section-title">时间明细</h3>' +
-          '<div class="section-note">每一段都可以回头看</div>' +
+          '<h3 class="section-title">' + UI_COPY.detailsTitle + '</h3>' +
+          '<div class="section-note">' + UI_COPY.detailsNote + '</div>' +
         '</div>';
 
     if (!events.length) {
@@ -553,16 +560,16 @@
     });
   }
 
-  function renderOutingSection(recentOuting) {
+  function renderPlannedSection(recentOuting) {
     var html =
       '<section class="section">' +
         '<div class="section-head">' +
-          '<h3 class="section-title">出门前提醒</h3>' +
-          '<div class="section-note">只是提醒，不替你决定</div>' +
+          '<h3 class="section-title">' + UI_COPY.plannedTitle + '</h3>' +
+          '<div class="section-note">' + UI_COPY.plannedNote + '</div>' +
         '</div>' +
         '<div class="card outing-card">' +
           '<div>' +
-            '<p class="outing-title">要出门了？先留一个轻量记录</p>' +
+            '<p class="outing-title">出门前留一下</p>' +
             '<p class="outing-text">如果去的是高消费区，会在行动前给你一个不带评判的小提醒。</p>' +
           '</div>' +
           '<button class="btn btn-soft" data-action="open-outing">出门前记录</button>' +
