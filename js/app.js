@@ -37,14 +37,14 @@
   var DURATION_OPTIONS = [15, 30, 45, 60, 90, 120, 150, 180];
   var HIGH_SPEND_LOCATIONS = ['mall', 'street', 'district'];
   var UI_COPY = {
-    todayTitle: '已经发生',
-    todayNote: '先把做过的，轻轻放回时间里',
-    quickAction: '记一段',
-    manualAction: '补一段',
-    detailsTitle: '时间明细',
-    detailsNote: '已经经过的，都在这里',
-    plannedTitle: '接下来',
-    plannedNote: '还没开始的，也可以先留一个入口'
+    todayTitle: '已记录',
+    todayNote: '先把已经发生的留在这里',
+    quickAction: '记录一下',
+    manualAction: '补记时间',
+    detailsTitle: '时间线',
+    detailsNote: '今天的时间流',
+    plannedTitle: '出门前',
+    plannedNote: '留一个轻提醒'
   };
 
   var uiState = {
@@ -569,10 +569,10 @@
         '</div>' +
         '<div class="card outing-card">' +
           '<div>' +
-            '<p class="outing-title">出门前留一下</p>' +
+            '<p class="outing-title">出门前记一下</p>' +
             '<p class="outing-text">如果去的是高消费区，会在行动前给你一个不带评判的小提醒。</p>' +
           '</div>' +
-          '<button class="btn btn-soft" data-action="open-outing">出门前记录</button>' +
+          '<button class="btn btn-soft" data-action="open-outing">去之前记一下</button>' +
         '</div>';
 
     if (recentOuting) {
