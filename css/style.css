@@ -31,6 +31,7 @@
   --space-4: 24px;
   --space-5: 32px;
   --top-bar-height: 72px;
+  --screen-pad: 16px;
 }
 
 * {
@@ -111,7 +112,7 @@ button {
 .main-content {
   width: min(860px, 100%);
   margin: 0 auto;
-  padding: var(--space-4) var(--space-3) 96px;
+  padding: var(--space-4) var(--screen-pad) 96px;
 }
 
 .page-stack {
@@ -294,8 +295,8 @@ button {
 
 .clock-face {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: min(280px, 100%);
+  aspect-ratio: 1;
   border-radius: 50%;
   box-shadow: inset 0 0 0 1px rgba(221, 217, 208, 0.5), 0 10px 28px rgba(120, 100, 80, 0.08);
 }
@@ -823,22 +824,97 @@ button {
 }
 
 @media (max-width: 760px) {
+  :root {
+    --top-bar-height: 64px;
+    --screen-pad: 14px;
+  }
+
+  body {
+    line-height: 1.5;
+  }
+
   .top-bar {
-    padding: 0 var(--space-3);
+    padding: 0 var(--screen-pad);
   }
 
-  .hero-grid,
-  .week-grid,
-  .time-row,
-  .duration-grid,
-  .clock-card {
-    grid-template-columns: 1fr;
+  .app-kicker {
+    font-size: 10px;
+    letter-spacing: 0.14em;
   }
 
-  .clock-card {
+  .app-title {
+    font-size: 20px;
+  }
+
+  .main-content {
+    padding-top: 18px;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .page-stack {
+    gap: 18px;
+  }
+
+  .card {
+    border-radius: 18px;
+  }
+
+  .hero-card {
+    padding: 18px;
+  }
+
+  .hero-title {
+    font-size: 30px;
+    line-height: 1.08;
+  }
+
+  .hero-text {
+    font-size: 14px;
+  }
+
+  .hero-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metric-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .metric-card {
+    padding: 14px;
+  }
+
+  .metric-value {
+    font-size: 18px;
+  }
+
+  .view-switch {
     display: flex;
+    width: 100%;
+  }
+
+  .view-tab {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .section {
+    gap: 14px;
+  }
+
+  .section-head {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .section-note {
+    font-size: 12px;
+    line-height: 1.45;
   }
 
   .dual-actions,
@@ -848,18 +924,222 @@ button {
     align-items: stretch;
   }
 
-  .main-content {
-    padding-left: 14px;
-    padding-right: 14px;
+  .dual-actions .btn,
+  .modal-actions .btn,
+  .outing-card .btn {
+    width: 100%;
+  }
+
+  .clock-card,
+  .time-row {
+    grid-template-columns: 1fr;
+  }
+
+  .clock-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+    gap: 18px;
+  }
+
+  .clock-wrap {
+    justify-content: center;
   }
 
   .clock-face {
-    width: 240px;
-    height: 240px;
+    width: min(72vw, 280px);
   }
 
   .clock-face::after,
   .clock-center {
-    inset: 30px;
+    inset: clamp(26px, 8vw, 36px);
   }
+
+  .clock-total {
+    font-size: 20px;
+  }
+
+  .clock-caption {
+    font-size: 11px;
+  }
+
+  .clock-legend {
+    gap: 8px;
+  }
+
+  .legend-chip {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 9px 12px;
+    font-size: 12px;
+  }
+
+  .week-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .week-card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .event-card {
+    padding: 16px;
+  }
+
+  .event-top {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .event-time {
+    font-size: 14px;
+  }
+
+  .event-side {
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .event-duration {
+    font-size: 15px;
+  }
+
+  .event-mode {
+    order: 2;
+  }
+
+  .event-delete {
+    margin-left: auto;
+  }
+
+  .status-pill {
+    font-size: 11px;
+    padding: 6px 9px;
+  }
+
+  .event-note {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .outing-card {
+    padding: 16px;
+  }
+
+  .outing-title {
+    font-size: 16px;
+  }
+
+  .outing-text,
+  .empty-text {
+    font-size: 13px;
+  }
+
+  .modal {
+    width: 100%;
+    max-height: min(94vh, 100%);
+    border-radius: 22px 22px 0 0;
+  }
+
+  .modal-header {
+    padding: 16px 14px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+
+  .modal-body {
+    padding: 16px 14px calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mode-switch {
+    display: flex;
+    width: 100%;
+  }
+
+  .mode-chip {
+    flex: 1;
+    min-width: 0;
+    padding: 0 12px;
+  }
+
+  .chip-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .choice-chip,
+  .duration-chip {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .duration-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .custom-duration,
+  .text-input,
+  .select-input {
+    min-height: 46px;
+  }
+
+  .text-area {
+    min-height: 88px;
+  }
+
+  .reminder-box {
+    padding: 16px;
+  }
+
+  .reminder-title {
+    font-size: 21px;
+  }
+
+  .reminder-text,
+  .reminder-highlight {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .toast {
+    width: calc(100% - 32px);
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    text-align: center;
+    border-radius: 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card:last-child {
+    grid-column: auto;
+  }
+
+  .clock-face {
+    width: min(78vw, 260px);
+  }
+
+  .chip-grid,
+  .duration-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 0 16px;
+  }
+}
 }
