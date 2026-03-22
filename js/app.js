@@ -38,13 +38,13 @@
   var HIGH_SPEND_LOCATIONS = ['mall', 'street', 'district'];
   var UI_COPY = {
     todayTitle: '已记录',
-    todayNote: '先把已经发生的留在这里',
+    todayNote: '',
     quickAction: '记录一下',
     manualAction: '补记时间',
     detailsTitle: '时间线',
-    detailsNote: '今天的时间流',
+    detailsNote: '',
     plannedTitle: '出门前',
-    plannedNote: '留一个轻提醒'
+    plannedNote: ''
   };
 
   var uiState = {
@@ -159,7 +159,7 @@
       '<section class="section">' +
         '<div class="section-head">' +
           '<h3 class="section-title">' + UI_COPY.todayTitle + '</h3>' +
-          '<div class="section-note">' + UI_COPY.todayNote + '</div>' +
+          (UI_COPY.todayNote ? '<div class="section-note">' + UI_COPY.todayNote + '</div>' : '') +
         '</div>' +
         renderClockCard(events, summary, false) +
         '<div class="dual-actions">' +
@@ -186,7 +186,6 @@
       '<section class="section">' +
         '<div class="section-head">' +
           '<h3 class="section-title">本周缩影</h3>' +
-          '<div class="section-note">七个小钟面，快速看清这一周的时间纹理</div>' +
         '</div>' +
         '<div class="week-grid">';
 
@@ -263,7 +262,7 @@
       '<section class="section">' +
         '<div class="section-head">' +
           '<h3 class="section-title">' + UI_COPY.detailsTitle + '</h3>' +
-          '<div class="section-note">' + UI_COPY.detailsNote + '</div>' +
+          (UI_COPY.detailsNote ? '<div class="section-note">' + UI_COPY.detailsNote + '</div>' : '') +
         '</div>';
 
     if (!events.length) {
@@ -565,7 +564,7 @@
       '<section class="section">' +
         '<div class="section-head">' +
           '<h3 class="section-title">' + UI_COPY.plannedTitle + '</h3>' +
-          '<div class="section-note">' + UI_COPY.plannedNote + '</div>' +
+          (UI_COPY.plannedNote ? '<div class="section-note">' + UI_COPY.plannedNote + '</div>' : '') +
         '</div>' +
         '<div class="card outing-card">' +
           '<div>' +
