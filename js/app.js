@@ -1,13 +1,13 @@
 (function() {
   var ACTIVITY_OPTIONS = [
-    { value: 'study', label: '学习', icon: '读', color: '#9bc38a', soft: '#eef7e8' },
-    { value: 'coding', label: 'coding', icon: '码', color: '#8bb4c7', soft: '#eaf4f8' },
-    { value: 'work', label: '工作', icon: '工', color: '#7f97c6', soft: '#edf1fb' },
-    { value: 'exercise', label: '运动', icon: '动', color: '#d7b56d', soft: '#fcf5e4' },
-    { value: 'social', label: '社交', icon: '聊', color: '#d4a0a0', soft: '#fbefef' },
-    { value: 'cook', label: '做饭', icon: '煮', color: '#d4a373', soft: '#fbf0e6' },
-    { value: 'rest', label: '休息', icon: '歇', color: '#b8b2c9', soft: '#f3f0f8' },
-    { value: 'nothing', label: '摆烂', icon: '躺', color: '#b7b0a5', soft: '#f2eee8' }
+    { value: 'study', label: '学习', icon: '读', color: '#8fa776', soft: '#f1f5ea' },
+    { value: 'coding', label: 'coding', icon: '码', color: '#8fa7b3', soft: '#eef4f6' },
+    { value: 'work', label: '工作', icon: '工', color: '#9d9cb7', soft: '#f1f0f8' },
+    { value: 'exercise', label: '运动', icon: '动', color: '#c5aa77', soft: '#f8f1e4' },
+    { value: 'social', label: '社交', icon: '聊', color: '#c9a4a1', soft: '#f8efee' },
+    { value: 'cook', label: '做饭', icon: '煮', color: '#c6a07c', soft: '#f8efe7' },
+    { value: 'rest', label: '休息', icon: '歇', color: '#b3adc0', soft: '#f2f0f6' },
+    { value: 'nothing', label: '摆烂', icon: '躺', color: '#b4aea5', soft: '#f2efea' }
   ];
 
   var STATUS_OPTIONS = {
@@ -779,14 +779,13 @@
       return 'conic-gradient(from -90deg, rgba(238,235,228,0.85) 0deg 360deg)';
     }
 
-    var segments = [];
+    var segments = ['rgba(238,235,228,0.72) 0deg 360deg'];
     events.forEach(function(event) {
       var meta = getActivityMeta(event.activity);
       var start = (event.startMinutes / 1440) * 360;
       var end = (event.endMinutes / 1440) * 360;
       segments.push(meta.color + ' ' + start + 'deg ' + end + 'deg');
     });
-    segments.push('rgba(238,235,228,0.72) 0deg 360deg');
     return 'conic-gradient(from -90deg, ' + segments.join(', ') + ')';
   }
 

@@ -175,7 +175,7 @@ button {
 }
 
 .view-tab.is-active {
-  background: linear-gradient(135deg, #8cc848, #70b434);
+  background: linear-gradient(135deg, #a8c586, #8fb16d);
   color: #fff;
 }
 
@@ -234,9 +234,9 @@ button {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #8cc848, #70b434);
+  background: linear-gradient(135deg, #a8c586, #8fb16d);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(140, 200, 72, 0.2);
+  box-shadow: 0 10px 24px rgba(143, 177, 109, 0.18);
 }
 
 .btn-secondary {
@@ -246,8 +246,9 @@ button {
 }
 
 .btn-soft {
-  background: rgba(237, 245, 249, 0.86);
-  color: var(--gray-800);
+  background: rgba(241, 245, 234, 0.92);
+  color: #73895c;
+  border: 1px solid rgba(168, 197, 134, 0.35);
 }
 
 .clock-card {
@@ -693,7 +694,7 @@ button {
 }
 
 .duration-chip.is-selected {
-  background: linear-gradient(135deg, #8cc848, #70b434);
+  background: linear-gradient(135deg, #a8c586, #8fb16d);
   color: #fff;
   border-color: transparent;
 }
@@ -1096,12 +1097,11 @@ button {
 
   .chip-grid,
   .duration-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .btn {
     min-height: 44px;
     padding: 0 16px;
   }
-}
 }
