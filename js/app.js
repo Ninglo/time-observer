@@ -114,7 +114,7 @@
 
     root.innerHTML =
       '<div class="page-stack">' +
-        renderHero(summary) +
+        renderHero() +
         renderViewSwitch() +
         (uiState.activeView === 'today'
           ? renderTodayView(todayEvents, summary, recentOuting)
@@ -122,17 +122,12 @@
       '</div>';
   }
 
-  function renderHero(summary) {
+  function renderHero() {
     return '' +
       '<section class="card hero-card">' +
         '<div class="hero-date">' + escapeHtml(formatLongDate(new Date())) + '</div>' +
         '<h2 class="hero-title">此刻有回声</h2>' +
         '<p class="hero-text">允许一切自然发生</p>' +
-        '<div class="hero-grid">' +
-          renderMetric('今日片段', summary.eventCount + ' 段', 'is-green') +
-          renderMetric('落在时间里', formatDuration(summary.totalMinutes), 'is-blue') +
-          renderMetric('留白', formatDuration(summary.blankMinutes), 'is-orange') +
-        '</div>' +
       '</section>';
   }
 
@@ -159,13 +154,23 @@
           '<h3 class="section-title">今日记录</h3>' +
           '<div class="section-note">先还原时间流，再看今天长成什么样</div>' +
         '</div>' +
+        renderClockCard(events, summary, false) +
         '<div class="dual-actions">' +
           '<button class="btn btn-primary" data-action="open-add" data-mode="quick">刚做完</button>' +
           '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记</button>' +
         '</div>' +
-        renderClockCard(events, summary, false) +
+        renderSummaryStrip(summary) +
         renderEventList(events) +
         renderOutingSection(recentOuting) +
+      '</section>';
+  }
+
+  function renderSummaryStrip(summary) {
+    return '' +
+      '<section class="summary-strip">' +
+        renderMetric('片段', summary.eventCount + ' 段', 'is-green') +
+        renderMetric('记录', formatDuration(summary.totalMinutes), 'is-blue') +
+        renderMetric('留白', formatDuration(summary.blankMinutes), 'is-orange') +
       '</section>';
   }
 
