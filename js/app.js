@@ -37,13 +37,13 @@
   var DURATION_OPTIONS = [15, 30, 45, 60, 90, 120, 150, 180];
   var HIGH_SPEND_LOCATIONS = ['mall', 'street', 'district'];
   var UI_COPY = {
-    todayTitle: '记录此刻',
+    todayTitle: '',
     todayNote: '',
     quickAction: '记录此刻',
     manualAction: '回溯时间',
     detailsTitle: '回溯时间',
     detailsNote: '',
-    plannedTitle: '马上行动',
+    plannedTitle: '',
     plannedNote: ''
   };
 
@@ -157,10 +157,12 @@
   function renderTodayView(events, summary, recentOuting) {
     return '' +
       '<section class="section">' +
-        '<div class="section-head">' +
-          '<h3 class="section-title">' + UI_COPY.todayTitle + '</h3>' +
-          (UI_COPY.todayNote ? '<div class="section-note">' + UI_COPY.todayNote + '</div>' : '') +
-        '</div>' +
+        (UI_COPY.todayTitle || UI_COPY.todayNote
+          ? '<div class="section-head">' +
+              (UI_COPY.todayTitle ? '<h3 class="section-title">' + UI_COPY.todayTitle + '</h3>' : '') +
+              (UI_COPY.todayNote ? '<div class="section-note">' + UI_COPY.todayNote + '</div>' : '') +
+            '</div>'
+          : '') +
         renderClockCard(events, summary, false) +
         '<div class="dual-actions">' +
           '<button class="btn btn-primary" data-action="open-add" data-mode="quick">' + UI_COPY.quickAction + '</button>' +
@@ -232,11 +234,7 @@
 
   function renderActivitySummary(events) {
     if (!events.length) {
-      return '' +
-        '<div class="clock-legend empty-legend">' +
-          '<div class="legend-empty-title">钟面还是空的</div>' +
-          '<div class="legend-empty-text">刚做完就记时长，想起来晚了就补开始和结束时间。</div>' +
-        '</div>';
+      return '';
     }
 
     var totals = {};
@@ -268,8 +266,7 @@
     if (!events.length) {
       html +=
         '<div class="card empty-card">' +
-          '<p class="empty-title">今天还没有时间块</p>' +
-          '<p class="empty-text">记录一段刚刚结束的事情，或者补上一段晚一点才想起来的时间。</p>' +
+          '<p class="empty-text">Any action is often better than no action.</p>' +
         '</div>';
       return html + '</section>';
     }
@@ -562,14 +559,16 @@
   function renderPlannedSection(recentOuting) {
     var html =
       '<section class="section">' +
-        '<div class="section-head">' +
-          '<h3 class="section-title">' + UI_COPY.plannedTitle + '</h3>' +
-          (UI_COPY.plannedNote ? '<div class="section-note">' + UI_COPY.plannedNote + '</div>' : '') +
-        '</div>' +
+        (UI_COPY.plannedTitle || UI_COPY.plannedNote
+          ? '<div class="section-head">' +
+              (UI_COPY.plannedTitle ? '<h3 class="section-title">' + UI_COPY.plannedTitle + '</h3>' : '') +
+              (UI_COPY.plannedNote ? '<div class="section-note">' + UI_COPY.plannedNote + '</div>' : '') +
+            '</div>'
+          : '') +
         '<div class="card outing-card">' +
           '<div>' +
-            '<p class="outing-title">马上行动</p>' +
-            '<p class="outing-text">如果去的是高消费区，会在行动前给你一个不带评判的小提醒。</p>' +
+            '<p class="outing-title">向未知出发</p>' +
+            '<p class="outing-text">To infinity and beyond.</p>' +
           '</div>' +
           '<button class="btn btn-soft" data-action="open-outing">马上行动</button>' +
         '</div>';
