@@ -369,18 +369,20 @@
 
   function renderManualFields() {
     return '' +
-      '<div class="field-group">' +
-        '<div class="field-label">补记日期</div>' +
-        '<input class="text-input" id="manual-day" type="date" value="' + escapeHtml(addFormState.dayKey) + '">' +
-      '</div>' +
-      '<div class="time-row">' +
-        '<div class="field-group">' +
-          '<div class="field-label">开始</div>' +
-          '<input class="text-input" id="manual-start" type="time" step="300" value="' + escapeHtml(addFormState.startTime) + '">' +
+      '<div class="manual-grid">' +
+        '<div class="field-group field-group-date">' +
+          '<div class="field-label">补记日期</div>' +
+          '<input class="text-input" id="manual-day" type="date" value="' + escapeHtml(addFormState.dayKey) + '">' +
         '</div>' +
-        '<div class="field-group">' +
-          '<div class="field-label">结束</div>' +
-          '<input class="text-input" id="manual-end" type="time" step="300" value="' + escapeHtml(addFormState.endTime) + '">' +
+        '<div class="time-row">' +
+          '<div class="field-group">' +
+            '<div class="field-label">开始</div>' +
+            '<input class="text-input" id="manual-start" type="time" step="300" value="' + escapeHtml(addFormState.startTime) + '">' +
+          '</div>' +
+          '<div class="field-group">' +
+            '<div class="field-label">结束</div>' +
+            '<input class="text-input" id="manual-end" type="time" step="300" value="' + escapeHtml(addFormState.endTime) + '">' +
+          '</div>' +
         '</div>' +
       '</div>' +
       '<div class="helper-text">如果和已有时间段重叠，保存前会提醒你是覆盖还是保留。</div>';
@@ -799,14 +801,14 @@
 
   function renderClockArcs(events, compact) {
     if (!events.length) return '';
-    var radius = compact ? 39 : 41;
-    var stroke = compact ? 14 : 16;
+    var radius = compact ? 38 : 43;
+    var stroke = compact ? 10 : 12;
     var arcs = events.map(function(event) {
       var meta = getActivityMeta(event.activity);
       return '<path d="' + describeArc(radius, event.startMinutes, event.endMinutes) + '" style="stroke:' + meta.color + '; stroke-width:' + stroke + ';" />';
     }).join('');
     return '<svg class="clock-arcs' + (compact ? ' is-small' : '') + '" viewBox="0 0 100 100" aria-hidden="true">' +
-      '<circle class="clock-track" cx="50" cy="50" r="' + radius + '"></circle>' +
+      '<circle class="clock-track" cx="50" cy="50" r="' + radius + '" style="stroke-width:' + stroke + ';"></circle>' +
       arcs +
     '</svg>';
   }
