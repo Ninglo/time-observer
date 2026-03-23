@@ -1,13 +1,13 @@
 (function() {
   var ACTIVITY_OPTIONS = [
-    { value: 'study', label: '学习', icon: '读', color: '#8fa776', soft: '#f1f5ea' },
-    { value: 'coding', label: 'coding', icon: '码', color: '#8fa7b3', soft: '#eef4f6' },
-    { value: 'work', label: '工作', icon: '工', color: '#9d9cb7', soft: '#f1f0f8' },
-    { value: 'exercise', label: '运动', icon: '动', color: '#c5aa77', soft: '#f8f1e4' },
-    { value: 'social', label: '社交', icon: '聊', color: '#c9a4a1', soft: '#f8efee' },
-    { value: 'cook', label: '做饭', icon: '煮', color: '#c6a07c', soft: '#f8efe7' },
-    { value: 'rest', label: '休息', icon: '歇', color: '#b3adc0', soft: '#f2f0f6' },
-    { value: 'nothing', label: '摆烂', icon: '躺', color: '#b4aea5', soft: '#f2efea' }
+    { value: 'study', label: '学习', icon: '读', color: '#8ea66a', soft: '#eef4e5' },
+    { value: 'coding', label: 'coding', icon: '码', color: '#7d98a8', soft: '#edf3f6' },
+    { value: 'work', label: '工作', icon: '工', color: '#9d97b0', soft: '#f1eef7' },
+    { value: 'exercise', label: '运动', icon: '动', color: '#b59a66', soft: '#f7efe2' },
+    { value: 'social', label: '社交', icon: '聊', color: '#c09a95', soft: '#f7efed' },
+    { value: 'cook', label: '做饭', icon: '煮', color: '#bc9070', soft: '#f8eee6' },
+    { value: 'rest', label: '休息', icon: '歇', color: '#a59fb4', soft: '#f1eff5' },
+    { value: 'nothing', label: '摆烂', icon: '躺', color: '#ada69a', soft: '#f2efe9' }
   ];
 
   var STATUS_OPTIONS = {
@@ -210,11 +210,11 @@
 
   function renderClockCard(events, summary, compact) {
     var sizeClass = compact ? ' clock-card-compact' : '';
+    var clockStyle = '--clock-fill:' + buildClockGradient(events) + ';';
     return '' +
       '<section class="card clock-card' + sizeClass + '">' +
         '<div class="clock-wrap">' +
-          '<div class="clock-face' + (compact ? ' is-small' : '') + '">' +
-            renderClockArcs(events, compact) +
+          '<div class="clock-face' + (compact ? ' is-small' : '') + '" style="' + clockStyle + '">' +
             renderClockMarkers(compact) +
             '<div class="clock-center' + (compact ? ' is-small' : '') + '">' +
               '<div class="clock-total">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
@@ -794,10 +794,10 @@
 
   function buildClockGradient(events) {
     if (!events.length) {
-      return 'conic-gradient(from -90deg, rgba(238,235,228,0.85) 0deg 360deg)';
+      return 'conic-gradient(from -90deg, rgba(236,232,224,0.92) 0deg 360deg)';
     }
 
-    var segments = ['rgba(238,235,228,0.72) 0deg 360deg'];
+    var segments = ['rgba(236,232,224,0.92) 0deg 360deg'];
     events.forEach(function(event) {
       var meta = getActivityMeta(event.activity);
       var start = (event.startMinutes / 1440) * 360;
