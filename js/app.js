@@ -331,17 +331,25 @@
   }
 
   function renderAddForm() {
+    var primaryFields = addFormState.mode === 'quick'
+      ? '<div class="field-group">' +
+          '<div class="field-label">活动类型</div>' +
+          '<div class="chip-grid activity-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
+        '</div>' +
+        renderQuickFields()
+      : renderManualFields() +
+        '<div class="field-group">' +
+          '<div class="field-label">活动类型</div>' +
+          '<div class="chip-grid activity-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
+        '</div>';
+
     return '' +
       '<form class="modal-stack" id="add-form">' +
         '<div class="mode-switch">' +
           '<button type="button" class="mode-chip' + (addFormState.mode === 'quick' ? ' is-active' : '') + '" data-mode-choice="quick">刚做完</button>' +
           '<button type="button" class="mode-chip' + (addFormState.mode === 'manual' ? ' is-active' : '') + '" data-mode-choice="manual">补记</button>' +
         '</div>' +
-        '<div class="field-group">' +
-          '<div class="field-label">活动类型</div>' +
-          '<div class="chip-grid activity-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
-        '</div>' +
-        (addFormState.mode === 'quick' ? renderQuickFields() : renderManualFields()) +
+        primaryFields +
         renderStatusField('energy', '精力') +
         renderStatusField('mood', '情绪') +
         renderStatusField('body', '身体') +
