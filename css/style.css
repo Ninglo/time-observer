@@ -275,14 +275,32 @@ button {
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
-  background: var(--clock-fill, conic-gradient(from -90deg, rgba(236, 232, 224, 0.92) 0deg 360deg));
+  background: rgba(236, 232, 224, 0.92);
   box-shadow: inset 0 0 0 1px rgba(221, 217, 208, 0.5), 0 10px 28px rgba(120, 100, 80, 0.08);
+}
+
+.clock-arcs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.clock-track {
+  fill: none;
+  stroke: rgba(236, 232, 224, 0.96);
+}
+
+.clock-arcs path {
+  fill: none;
+  stroke-linecap: round;
 }
 
 .clock-core {
   position: absolute;
   inset: 34px;
-  z-index: 0;
+  z-index: 1;
   border-radius: 50%;
   background: rgba(255, 254, 249, 0.94);
   box-shadow: inset 0 0 0 1px rgba(221, 217, 208, 0.55);

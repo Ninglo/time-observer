@@ -210,11 +210,11 @@
 
   function renderClockCard(events, summary, compact) {
     var sizeClass = compact ? ' clock-card-compact' : '';
-    var clockStyle = '--clock-fill:' + buildClockGradient(events) + ';';
     return '' +
       '<section class="card clock-card' + sizeClass + '">' +
         '<div class="clock-wrap">' +
-          '<div class="clock-face' + (compact ? ' is-small' : '') + '" style="' + clockStyle + '">' +
+          '<div class="clock-face' + (compact ? ' is-small' : '') + '">' +
+            renderClockArcs(events, compact) +
             '<div class="clock-core' + (compact ? ' is-small' : '') + '"></div>' +
             renderClockMarkers(compact) +
             '<div class="clock-center' + (compact ? ' is-small' : '') + '">' +
