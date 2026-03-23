@@ -166,6 +166,29 @@ button {
   box-shadow: var(--shadow);
 }
 
+.palette-strip {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.palette-chip {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(221, 217, 208, 0.75);
+  background: rgba(255, 254, 249, 0.78);
+  color: var(--gray-600);
+  font-size: 12px;
+  box-shadow: var(--shadow);
+}
+
+.palette-chip.is-active {
+  background: linear-gradient(135deg, #f0e3c4, #ead9f1);
+  color: var(--gray-900);
+  border-color: rgba(210, 190, 154, 0.75);
+}
+
 .view-tab {
   min-height: 40px;
   min-width: 88px;
@@ -294,7 +317,7 @@ button {
 
 .clock-arcs path {
   fill: none;
-  stroke-linecap: round;
+  stroke-linecap: butt;
 }
 
 .clock-core {
@@ -899,6 +922,18 @@ button {
   .view-switch {
     display: flex;
     width: 100%;
+  }
+
+  .palette-strip {
+    gap: 6px;
+  }
+
+  .palette-chip {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    padding: 0 10px;
   }
 
   .view-tab {

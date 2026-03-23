@@ -1,14 +1,63 @@
 (function() {
-  var ACTIVITY_OPTIONS = [
-    { value: 'study', label: '学习', icon: '读', color: '#8ea66a', soft: '#eef4e5' },
-    { value: 'coding', label: 'coding', icon: '码', color: '#7d98a8', soft: '#edf3f6' },
-    { value: 'work', label: '工作', icon: '工', color: '#9d97b0', soft: '#f1eef7' },
-    { value: 'exercise', label: '运动', icon: '动', color: '#b59a66', soft: '#f7efe2' },
-    { value: 'social', label: '社交', icon: '聊', color: '#c09a95', soft: '#f7efed' },
-    { value: 'cook', label: '做饭', icon: '煮', color: '#bc9070', soft: '#f8eee6' },
-    { value: 'rest', label: '休息', icon: '歇', color: '#a59fb4', soft: '#f1eff5' },
-    { value: 'nothing', label: '摆烂', icon: '躺', color: '#ada69a', soft: '#f2efe9' }
+  var PALETTE_STORAGE_KEY = 'time_observer_palette_v1';
+  var PALETTE_OPTIONS = [
+    { value: 'moss', label: '苔原' },
+    { value: 'mist', label: '海雾' },
+    { value: 'orchard', label: '果园' },
+    { value: 'dusk', label: '暮色' }
   ];
+  var ACTIVITY_OPTIONS = [
+    { value: 'study', label: '学习', icon: '读' },
+    { value: 'coding', label: 'coding', icon: '码' },
+    { value: 'work', label: '工作', icon: '工' },
+    { value: 'exercise', label: '运动', icon: '动' },
+    { value: 'social', label: '社交', icon: '聊' },
+    { value: 'cook', label: '做饭', icon: '煮' },
+    { value: 'rest', label: '休息', icon: '歇' },
+    { value: 'nothing', label: '摆烂', icon: '躺' }
+  ];
+  var ACTIVITY_PALETTES = {
+    moss: {
+      study: { color: '#78995f', soft: '#edf4e5' },
+      coding: { color: '#6f8ea1', soft: '#ebf2f6' },
+      work: { color: '#8e86a8', soft: '#f0edf8' },
+      exercise: { color: '#b39459', soft: '#f8efdf' },
+      social: { color: '#bf8f98', soft: '#f8ecef' },
+      cook: { color: '#b78363', soft: '#f8ede6' },
+      rest: { color: '#938aa7', soft: '#f0edf6' },
+      nothing: { color: '#a79f94', soft: '#f2eee8' }
+    },
+    mist: {
+      study: { color: '#5d8f7e', soft: '#e8f5f1' },
+      coding: { color: '#5f84b8', soft: '#eaf0fb' },
+      work: { color: '#7b78ac', soft: '#eceaf8' },
+      exercise: { color: '#c28a68', soft: '#faeee6' },
+      social: { color: '#c2869e', soft: '#faebf1' },
+      cook: { color: '#b47759', soft: '#f8ece4' },
+      rest: { color: '#7c94a6', soft: '#edf3f7' },
+      nothing: { color: '#979d9f', soft: '#eef1f2' }
+    },
+    orchard: {
+      study: { color: '#6f9a44', soft: '#eef6e4' },
+      coding: { color: '#4e8ca8', soft: '#e8f5f8' },
+      work: { color: '#a06698', soft: '#f7eaf4' },
+      exercise: { color: '#cc8a3d', soft: '#fbf0de' },
+      social: { color: '#d27d7f', soft: '#fbe9e7' },
+      cook: { color: '#bf6f45', soft: '#f9ece2' },
+      rest: { color: '#8d86c7', soft: '#eeecfb' },
+      nothing: { color: '#9c927d', soft: '#f3eee4' }
+    },
+    dusk: {
+      study: { color: '#4f7f64', soft: '#e5f0ea' },
+      coding: { color: '#4a7198', soft: '#e6eef6' },
+      work: { color: '#7b689a', soft: '#ede8f6' },
+      exercise: { color: '#a97844', soft: '#f5ebdf' },
+      social: { color: '#ab667e', soft: '#f4e7ec' },
+      cook: { color: '#93644a', soft: '#f2e8e2' },
+      rest: { color: '#697e95', soft: '#e8edf2' },
+      nothing: { color: '#7b7b80', soft: '#ebebee' }
+    }
+  };
 
   var STATUS_OPTIONS = {
     energy: [
@@ -49,7 +98,8 @@
 
   var uiState = {
     activeView: 'today',
-    addMode: 'quick'
+    addMode: 'quick',
+    palette: resolveStoredPalette()
   };
 
   var addFormState = getDefaultAddState();
@@ -100,6 +150,12 @@
         renderApp();
       }
 
+      if (action === 'set-palette') {
+        uiState.palette = target.getAttribute('data-palette') || 'moss';
+        localStorage.setItem(PALETTE_STORAGE_KEY, uiState.palette);
+        renderApp();
+      }
+
       if (action === 'open-add') {
         openAddModal(target.getAttribute('data-mode') || 'quick');
       }
@@ -127,10 +183,30 @@
     root.innerHTML =
       '<div class="page-stack">' +
         renderViewSwitch() +
+        renderPaletteSwitcher() +
         (uiState.activeView === 'today'
           ? renderTodayView(todayEvents, summary, recentOuting)
           : renderWeekView(weekDays)) +
       '</div>';
+  }
+
+  function resolveStoredPalette() {
+    try {
+      var stored = localStorage.getItem(PALETTE_STORAGE_KEY);
+      return ACTIVITY_PALETTES[stored] ? stored : 'moss';
+    } catch (error) {
+      return 'moss';
+    }
+  }
+
+  function renderPaletteSwitcher() {
+    return '' +
+      '<section class="palette-strip" aria-label="时间配色方案">' +
+        PALETTE_OPTIONS.map(function(option) {
+          var selected = uiState.palette === option.value ? ' is-active' : '';
+          return '<button class="palette-chip' + selected + '" data-action="set-palette" data-palette="' + option.value + '" type="button">' + escapeHtml(option.label) + '</button>';
+        }).join('') +
+      '</section>';
   }
 
   function updateTopBar() {
@@ -407,8 +483,9 @@
 
   function renderActivityChips() {
     return ACTIVITY_OPTIONS.map(function(option) {
+      var meta = getActivityMeta(option.value);
       var selected = addFormState.activity === option.value ? ' is-selected' : '';
-      return '<button type="button" class="choice-chip' + selected + '" data-activity="' + option.value + '" style="--chip-bg:' + option.soft + '; --chip-text:' + option.color + ';">' + escapeHtml(option.label) + '</button>';
+      return '<button type="button" class="choice-chip' + selected + '" data-activity="' + option.value + '" style="--chip-bg:' + meta.soft + '; --chip-text:' + meta.color + ';">' + escapeHtml(option.label) + '</button>';
     }).join('');
   }
 
@@ -771,9 +848,18 @@
   }
 
   function getActivityMeta(value) {
-    return ACTIVITY_OPTIONS.find(function(item) {
+    var base = ACTIVITY_OPTIONS.find(function(item) {
       return item.value === value;
     }) || ACTIVITY_OPTIONS[0];
+    var palette = ACTIVITY_PALETTES[uiState.palette] || ACTIVITY_PALETTES.moss;
+    var colors = palette[base.value] || ACTIVITY_PALETTES.moss[base.value];
+    return {
+      value: base.value,
+      label: base.label,
+      icon: base.icon,
+      color: colors.color,
+      soft: colors.soft
+    };
   }
 
   function getStatusOption(group, value) {
@@ -823,12 +909,12 @@
   }
 
   function describeArc(radius, startMinutes, endMinutes) {
-    var start = polarToCartesian(radius, endMinutes);
-    var end = polarToCartesian(radius, startMinutes);
+    var start = polarToCartesian(radius, startMinutes);
+    var end = polarToCartesian(radius, endMinutes);
     var largeArcFlag = endMinutes - startMinutes > 720 ? 1 : 0;
     return [
       'M', start.x, start.y,
-      'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
+      'A', radius, radius, 0, largeArcFlag, 1, end.x, end.y
     ].join(' ');
   }
 
