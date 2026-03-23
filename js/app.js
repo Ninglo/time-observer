@@ -215,6 +215,7 @@
       '<section class="card clock-card' + sizeClass + '">' +
         '<div class="clock-wrap">' +
           '<div class="clock-face' + (compact ? ' is-small' : '') + '" style="' + clockStyle + '">' +
+            '<div class="clock-core' + (compact ? ' is-small' : '') + '"></div>' +
             renderClockMarkers(compact) +
             '<div class="clock-center' + (compact ? ' is-small' : '') + '">' +
               '<div class="clock-total">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +

@@ -279,10 +279,10 @@ button {
   box-shadow: inset 0 0 0 1px rgba(221, 217, 208, 0.5), 0 10px 28px rgba(120, 100, 80, 0.08);
 }
 
-.clock-face::after {
-  content: "";
+.clock-core {
   position: absolute;
   inset: 34px;
+  z-index: 0;
   border-radius: 50%;
   background: rgba(255, 254, 249, 0.94);
   box-shadow: inset 0 0 0 1px rgba(221, 217, 208, 0.55);
@@ -293,14 +293,14 @@ button {
   height: 136px;
 }
 
-.clock-face.is-small::after {
+.clock-core.is-small {
   inset: 24px;
 }
 
 .clock-center {
   position: absolute;
   inset: 34px;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -315,6 +315,9 @@ button {
 .clock-total {
   font-size: 22px;
   color: var(--gray-900);
+  font-weight: 600;
+  line-height: 1.15;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .clock-center.is-small .clock-total {
@@ -329,7 +332,7 @@ button {
 
 .clock-marker {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   font-size: 11px;
   color: var(--gray-500);
 }
@@ -937,7 +940,7 @@ button {
     width: min(72vw, 280px);
   }
 
-  .clock-face::after,
+  .clock-core,
   .clock-center {
     inset: clamp(30px, 8.8vw, 34px);
   }
@@ -1134,7 +1137,7 @@ button {
     width: min(78vw, 260px);
   }
 
-  .clock-face::after,
+  .clock-core,
   .clock-center {
     inset: 28px;
   }
