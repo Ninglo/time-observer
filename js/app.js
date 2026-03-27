@@ -1,12 +1,5 @@
 (function() {
-  var PALETTE_STORAGE_KEY = 'time_observer_palette_v1';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
-  var PALETTE_OPTIONS = [
-    { value: 'moss', label: '森雾渐变' },
-    { value: 'mist', label: '海雾渐变' },
-    { value: 'orchard', label: '果园渐变' },
-    { value: 'dusk', label: '暮色渐变' }
-  ];
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
     { value: 'coding', label: 'coding', icon: '码' },
@@ -18,46 +11,14 @@
     { value: 'nothing', label: '摆烂', icon: '躺' }
   ];
   var ACTIVITY_PALETTES = {
-    moss: {
-      study: { color: '#78995f', soft: '#edf4e5' },
-      coding: { color: '#6f8ea1', soft: '#ebf2f6' },
-      work: { color: '#8e86a8', soft: '#f0edf8' },
-      exercise: { color: '#b39459', soft: '#f8efdf' },
-      social: { color: '#bf8f98', soft: '#f8ecef' },
-      cook: { color: '#b78363', soft: '#f8ede6' },
-      rest: { color: '#938aa7', soft: '#f0edf6' },
-      nothing: { color: '#a79f94', soft: '#f2eee8' }
-    },
-    mist: {
-      study: { color: '#5d8f7e', soft: '#e8f5f1' },
-      coding: { color: '#5f84b8', soft: '#eaf0fb' },
-      work: { color: '#7b78ac', soft: '#eceaf8' },
-      exercise: { color: '#c28a68', soft: '#faeee6' },
-      social: { color: '#c2869e', soft: '#faebf1' },
-      cook: { color: '#b47759', soft: '#f8ece4' },
-      rest: { color: '#7c94a6', soft: '#edf3f7' },
-      nothing: { color: '#979d9f', soft: '#eef1f2' }
-    },
-    orchard: {
-      study: { color: '#6f9a44', soft: '#eef6e4' },
-      coding: { color: '#4e8ca8', soft: '#e8f5f8' },
-      work: { color: '#a06698', soft: '#f7eaf4' },
-      exercise: { color: '#cc8a3d', soft: '#fbf0de' },
-      social: { color: '#d27d7f', soft: '#fbe9e7' },
-      cook: { color: '#bf6f45', soft: '#f9ece2' },
-      rest: { color: '#8d86c7', soft: '#eeecfb' },
-      nothing: { color: '#9c927d', soft: '#f3eee4' }
-    },
-    dusk: {
-      study: { color: '#4f7f64', soft: '#e5f0ea' },
-      coding: { color: '#4a7198', soft: '#e6eef6' },
-      work: { color: '#7b689a', soft: '#ede8f6' },
-      exercise: { color: '#a97844', soft: '#f5ebdf' },
-      social: { color: '#ab667e', soft: '#f4e7ec' },
-      cook: { color: '#93644a', soft: '#f2e8e2' },
-      rest: { color: '#697e95', soft: '#e8edf2' },
-      nothing: { color: '#7b7b80', soft: '#ebebee' }
-    }
+    study: { color: '#9bbca5', soft: '#f0f7f2' },
+    coding: { color: '#98b4c7', soft: '#eff5f9' },
+    work: { color: '#b5adc9', soft: '#f4f1f9' },
+    exercise: { color: '#d2b595', soft: '#faf4eb' },
+    social: { color: '#d5aab5', soft: '#faeff3' },
+    cook: { color: '#cfaa96', soft: '#faf1ec' },
+    rest: { color: '#aab8ca', soft: '#f0f4f8' },
+    nothing: { color: '#c1b9af', soft: '#f5f2ee' }
   };
 
   var STATUS_OPTIONS = {
@@ -99,8 +60,7 @@
 
   var uiState = {
     activeView: 'today',
-    addMode: 'quick',
-    palette: resolveStoredPalette()
+    addMode: 'quick'
   };
 
   var addFormState = getDefaultAddState();
@@ -153,12 +113,6 @@
         renderApp();
       }
 
-      if (action === 'set-palette') {
-        uiState.palette = target.getAttribute('data-palette') || 'moss';
-        localStorage.setItem(PALETTE_STORAGE_KEY, uiState.palette);
-        renderApp();
-      }
-
       if (action === 'open-add') {
         openAddModal(target.getAttribute('data-mode') || 'quick');
       }
@@ -186,36 +140,10 @@
     root.innerHTML =
       '<div class="page-stack">' +
         renderViewSwitch() +
-        renderPaletteSwitcher() +
         (uiState.activeView === 'today'
           ? renderTodayView(todayEvents, summary, recentOuting)
           : renderWeekView(weekDays)) +
       '</div>';
-  }
-
-  function resolveStoredPalette() {
-    try {
-      var stored = localStorage.getItem(PALETTE_STORAGE_KEY);
-      return ACTIVITY_PALETTES[stored] ? stored : 'moss';
-    } catch (error) {
-      return 'moss';
-    }
-  }
-
-  function renderPaletteSwitcher() {
-    return '' +
-      '<section class="palette-panel">' +
-        '<div class="palette-panel-head">' +
-          '<div class="palette-title">圆环配色</div>' +
-          '<div class="palette-note">下面这 4 个是显示方案，只影响颜色，不影响记录内容。</div>' +
-        '</div>' +
-        '<div class="palette-strip" aria-label="时间配色方案">' +
-          PALETTE_OPTIONS.map(function(option) {
-            var selected = uiState.palette === option.value ? ' is-active' : '';
-            return '<button class="palette-chip' + selected + '" data-action="set-palette" data-palette="' + option.value + '" type="button">' + escapeHtml(option.label) + '</button>';
-          }).join('') +
-        '</div>' +
-      '</section>';
   }
 
   function updateTopBar() {
@@ -898,8 +826,7 @@
     var base = getAllActivityOptions().find(function(item) {
       return item.value === value;
     }) || ACTIVITY_OPTIONS[0];
-    var palette = ACTIVITY_PALETTES[uiState.palette] || ACTIVITY_PALETTES.moss;
-    var colors = palette[base.value] || buildCustomActivityColors(base.value);
+    var colors = ACTIVITY_PALETTES[base.value] || buildCustomActivityColors(base.value);
     return {
       value: base.value,
       label: base.label,
@@ -951,10 +878,10 @@
 
   function buildCustomActivityColors(seed) {
     var palette = [
-      { color: '#7d9f8c', soft: '#e8f2ed' },
-      { color: '#8b83b1', soft: '#edeaf8' },
-      { color: '#b88967', soft: '#f7ece5' },
-      { color: '#7f94b0', soft: '#ebf0f7' }
+      { color: '#a5c0ae', soft: '#f1f7f3' },
+      { color: '#b5aed0', soft: '#f5f2fa' },
+      { color: '#d1b39e', soft: '#faf3ee' },
+      { color: '#a8bacd', soft: '#f1f5f8' }
     ];
     var index = Math.abs(hashString(seed || 'custom')) % palette.length;
     return palette[index];
@@ -1042,8 +969,8 @@
 
   function getActivityGradient(meta) {
     return {
-      from: mixHex(meta.color, '#ffffff', 0.22),
-      to: mixHex(meta.color, '#5e4d3d', 0.18)
+      from: mixHex(meta.color, '#ffffff', 0.34),
+      to: mixHex(meta.color, '#d8e0e6', 0.24)
     };
   }
 
