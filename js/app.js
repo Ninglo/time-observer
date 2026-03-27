@@ -1,10 +1,11 @@
 (function() {
   var PALETTE_STORAGE_KEY = 'time_observer_palette_v1';
+  var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var PALETTE_OPTIONS = [
-    { value: 'moss', label: '苔原' },
-    { value: 'mist', label: '海雾' },
-    { value: 'orchard', label: '果园' },
-    { value: 'dusk', label: '暮色' }
+    { value: 'moss', label: '森雾渐变' },
+    { value: 'mist', label: '海雾渐变' },
+    { value: 'orchard', label: '果园渐变' },
+    { value: 'dusk', label: '暮色渐变' }
   ];
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
@@ -89,8 +90,8 @@
     todayTitle: '',
     todayNote: '',
     quickAction: '记录此刻',
-    manualAction: '回溯时间',
-    detailsTitle: '回溯时间',
+    manualAction: '补记时间',
+    detailsTitle: '补记时间',
     detailsNote: '',
     plannedTitle: '',
     plannedNote: ''
@@ -117,6 +118,8 @@
       dayKey: Storage.getTodayKey(),
       startTime: '09:00',
       endTime: '10:00',
+      tags: '',
+      customActivity: '',
       energy: '',
       mood: '',
       body: '',
@@ -201,11 +204,17 @@
 
   function renderPaletteSwitcher() {
     return '' +
-      '<section class="palette-strip" aria-label="时间配色方案">' +
-        PALETTE_OPTIONS.map(function(option) {
-          var selected = uiState.palette === option.value ? ' is-active' : '';
-          return '<button class="palette-chip' + selected + '" data-action="set-palette" data-palette="' + option.value + '" type="button">' + escapeHtml(option.label) + '</button>';
-        }).join('') +
+      '<section class="palette-panel">' +
+        '<div class="palette-panel-head">' +
+          '<div class="palette-title">圆环配色</div>' +
+          '<div class="palette-note">下面这 4 个是显示方案，只影响颜色，不影响记录内容。</div>' +
+        '</div>' +
+        '<div class="palette-strip" aria-label="时间配色方案">' +
+          PALETTE_OPTIONS.map(function(option) {
+            var selected = uiState.palette === option.value ? ' is-active' : '';
+            return '<button class="palette-chip' + selected + '" data-action="set-palette" data-palette="' + option.value + '" type="button">' + escapeHtml(option.label) + '</button>';
+          }).join('') +
+        '</div>' +
       '</section>';
   }
 
@@ -324,9 +333,10 @@
       '<div class="clock-legend">' +
         Object.keys(totals).map(function(key) {
           var activity = getActivityMeta(key);
+          var gradient = getActivityGradient(activity);
           return '' +
             '<div class="legend-chip" style="--legend-bg:' + activity.soft + '; --legend-text:' + activity.color + ';">' +
-              '<span class="legend-dot" style="background:' + activity.color + ';"></span>' +
+              '<span class="legend-dot" style="background:linear-gradient(135deg, ' + gradient.from + ', ' + gradient.to + ');"></span>' +
               '<span>' + escapeHtml(activity.label) + ' ' + escapeHtml(formatDuration(totals[key])) + '</span>' +
             '</div>';
         }).join('') +
@@ -362,6 +372,7 @@
     if (event.energy) statuses.push(renderStatusPill('energy', event.energy));
     if (event.mood) statuses.push(renderStatusPill('mood', event.mood));
     if (event.body) statuses.push(renderStatusPill('body', event.body));
+    var tags = Array.isArray(event.tags) ? event.tags.filter(Boolean) : [];
 
     var meta = getActivityMeta(event.activity);
     return '' +
@@ -382,6 +393,7 @@
           '</div>' +
         '</div>' +
         (statuses.length ? '<div class="event-status-row">' + statuses.join('') + '</div>' : '') +
+        (tags.length ? '<div class="event-tags-row">' + tags.map(function(tag) { return '<span class="event-tag">' + escapeHtml(tag) + '</span>'; }).join('') + '</div>' : '') +
         (event.note ? '<div class="event-note">' + escapeHtml(event.note) + '</div>' : '') +
       '</article>';
   }
@@ -403,7 +415,7 @@
       addFormState.endTime = formatTime(endMinutes);
       addFormState.startTime = formatTime(Math.max(0, endMinutes - addFormState.duration));
     }
-    setModal('记下这一段', renderAddForm());
+    setModal(addFormState.mode === 'manual' ? '补记时间' : '记下一段', renderAddForm());
     bindAddFormEvents();
   }
 
@@ -424,12 +436,23 @@
       '<form class="modal-stack" id="add-form">' +
         '<div class="mode-switch">' +
           '<button type="button" class="mode-chip' + (addFormState.mode === 'quick' ? ' is-active' : '') + '" data-mode-choice="quick">刚做完</button>' +
-          '<button type="button" class="mode-chip' + (addFormState.mode === 'manual' ? ' is-active' : '') + '" data-mode-choice="manual">补记</button>' +
+          '<button type="button" class="mode-chip' + (addFormState.mode === 'manual' ? ' is-active' : '') + '" data-mode-choice="manual">补记时间</button>' +
         '</div>' +
         primaryFields +
+        '<div class="field-group">' +
+          '<div class="field-label">自定义活动</div>' +
+          '<div class="custom-activity-row">' +
+            '<input class="text-input" id="custom-activity-input" type="text" maxlength="12" placeholder="比如：收拾屋子" value="' + escapeHtml(addFormState.customActivity) + '">' +
+            '<button type="button" class="btn btn-soft custom-activity-btn" id="add-custom-activity">加入活动</button>' +
+          '</div>' +
+        '</div>' +
         renderStatusField('energy', '精力') +
         renderStatusField('mood', '情绪') +
         renderStatusField('body', '身体') +
+        '<div class="field-group">' +
+          '<div class="field-label">自由标签</div>' +
+          '<input class="text-input" id="event-tags" type="text" maxlength="40" placeholder="可写多个，用逗号隔开，比如：家务, 清洁" value="' + escapeHtml(addFormState.tags) + '">' +
+        '</div>' +
         '<div class="field-group note-group">' +
           '<button type="button" class="text-link" id="toggle-note">' + (addFormState.noteOpen ? '收起备注' : '添加备注') + '</button>' +
           (addFormState.noteOpen
@@ -470,7 +493,7 @@
           '</div>' +
         '</div>' +
       '</div>' +
-      '<div class="helper-text">如果和已有时间段重叠，保存前会提醒你是覆盖还是保留。</div>';
+      '<div class="helper-text">把开始和结束填完整就行；如果和已有记录重叠，保存前会提醒你怎么处理。</div>';
   }
 
   function renderStatusField(group, label) {
@@ -482,7 +505,7 @@
   }
 
   function renderActivityChips() {
-    return ACTIVITY_OPTIONS.map(function(option) {
+    return getAllActivityOptions().map(function(option) {
       var meta = getActivityMeta(option.value);
       var selected = addFormState.activity === option.value ? ' is-selected' : '';
       return '<button type="button" class="choice-chip' + selected + '" data-activity="' + option.value + '" style="--chip-bg:' + meta.soft + '; --chip-text:' + meta.color + ';">' + escapeHtml(option.label) + '</button>';
@@ -506,8 +529,28 @@
   function bindAddFormEvents() {
     document.getElementById('cancel-add').addEventListener('click', closeModal);
     document.getElementById('event-note').value = addFormState.note;
+    document.getElementById('event-tags').addEventListener('input', function() {
+      addFormState.tags = this.value;
+    });
+    document.getElementById('custom-activity-input').addEventListener('input', function() {
+      addFormState.customActivity = this.value;
+    });
+    document.getElementById('add-custom-activity').addEventListener('click', function() {
+      var label = document.getElementById('custom-activity-input').value.trim();
+      if (!label) {
+        showToast('先写一个活动名');
+        return;
+      }
+      addFormState.activity = saveCustomActivity(label);
+      addFormState.customActivity = '';
+      setModal('记下这一段', renderAddForm());
+      bindAddFormEvents();
+      showToast('已经加入活动');
+    });
     document.getElementById('toggle-note').addEventListener('click', function() {
       addFormState.note = document.getElementById('event-note').value.trim();
+      addFormState.tags = document.getElementById('event-tags').value.trim();
+      addFormState.customActivity = document.getElementById('custom-activity-input').value.trim();
       addFormState.noteOpen = !addFormState.noteOpen;
       setModal('记下这一段', renderAddForm());
       bindAddFormEvents();
@@ -516,9 +559,11 @@
     document.querySelectorAll('[data-mode-choice]').forEach(function(node) {
       node.addEventListener('click', function() {
         addFormState.note = document.getElementById('event-note').value.trim();
+        addFormState.tags = document.getElementById('event-tags').value.trim();
+        addFormState.customActivity = document.getElementById('custom-activity-input').value.trim();
         addFormState.mode = node.getAttribute('data-mode-choice');
         uiState.addMode = addFormState.mode;
-        setModal('记下这一段', renderAddForm());
+        setModal(addFormState.mode === 'manual' ? '补记时间' : '记下一段', renderAddForm());
         bindAddFormEvents();
       });
     });
@@ -574,9 +619,11 @@
 
   function submitAddForm(strategy) {
     addFormState.note = document.getElementById('event-note').value.trim();
+    addFormState.tags = document.getElementById('event-tags').value.trim();
     var payload = {
       activity: addFormState.activity,
       note: addFormState.note,
+      tags: parseTagInput(addFormState.tags),
       energy: addFormState.energy,
       mood: addFormState.mood,
       body: addFormState.body
@@ -848,11 +895,11 @@
   }
 
   function getActivityMeta(value) {
-    var base = ACTIVITY_OPTIONS.find(function(item) {
+    var base = getAllActivityOptions().find(function(item) {
       return item.value === value;
     }) || ACTIVITY_OPTIONS[0];
     var palette = ACTIVITY_PALETTES[uiState.palette] || ACTIVITY_PALETTES.moss;
-    var colors = palette[base.value] || ACTIVITY_PALETTES.moss[base.value];
+    var colors = palette[base.value] || buildCustomActivityColors(base.value);
     return {
       value: base.value,
       label: base.label,
@@ -860,6 +907,63 @@
       color: colors.color,
       soft: colors.soft
     };
+  }
+
+  function getAllActivityOptions() {
+    return ACTIVITY_OPTIONS.concat(readCustomActivities());
+  }
+
+  function readCustomActivities() {
+    try {
+      var raw = localStorage.getItem(CUSTOM_ACTIVITY_STORAGE_KEY);
+      var parsed = JSON.parse(raw || '[]');
+      return Array.isArray(parsed)
+        ? parsed.map(function(item) {
+            var label = String(item.label || '').trim();
+            var value = String(item.value || '').trim();
+            if (!label || !value) return null;
+            return { value: value, label: label, icon: '签' };
+          }).filter(Boolean)
+        : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveCustomActivity(label) {
+    var trimmed = String(label || '').trim();
+    var value = 'custom_' + trimmed.toLowerCase().replace(/\s+/g, '_');
+    var activities = readCustomActivities();
+    if (!activities.some(function(item) { return item.value === value; })) {
+      activities.push({ value: value, label: trimmed, icon: '签' });
+      localStorage.setItem(CUSTOM_ACTIVITY_STORAGE_KEY, JSON.stringify(activities));
+    }
+    return value;
+  }
+
+  function parseTagInput(input) {
+    return String(input || '')
+      .split(/[，,、]/)
+      .map(function(item) { return item.trim(); })
+      .filter(Boolean)
+      .slice(0, 6);
+  }
+
+  function buildCustomActivityColors(seed) {
+    var palette = [
+      { color: '#7d9f8c', soft: '#e8f2ed' },
+      { color: '#8b83b1', soft: '#edeaf8' },
+      { color: '#b88967', soft: '#f7ece5' },
+      { color: '#7f94b0', soft: '#ebf0f7' }
+    ];
+    var index = Math.abs(hashString(seed || 'custom')) % palette.length;
+    return palette[index];
+  }
+
+  function hashString(value) {
+    return String(value || '').split('').reduce(function(sum, char) {
+      return ((sum << 5) - sum) + char.charCodeAt(0);
+    }, 0);
   }
 
   function getStatusOption(group, value) {
@@ -898,11 +1002,21 @@
     if (!events.length) return '';
     var radius = compact ? 38 : 43;
     var stroke = compact ? 10 : 12;
-    var arcs = events.map(function(event) {
+    var defs = events.map(function(event, index) {
       var meta = getActivityMeta(event.activity);
-      return '<path d="' + describeArc(radius, event.startMinutes, event.endMinutes) + '" style="stroke:' + meta.color + '; stroke-width:' + stroke + ';" />';
+      var gradient = getActivityGradient(meta);
+      var gradientId = getClockGradientId(event, compact, index);
+      return '<linearGradient id="' + gradientId + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
+        '<stop offset="0%" stop-color="' + gradient.from + '"></stop>' +
+        '<stop offset="100%" stop-color="' + gradient.to + '"></stop>' +
+      '</linearGradient>';
+    }).join('');
+    var arcs = events.map(function(event, index) {
+      var gradientId = getClockGradientId(event, compact, index);
+      return '<path d="' + describeArc(radius, event.startMinutes, event.endMinutes) + '" style="stroke:url(#' + gradientId + '); stroke-width:' + stroke + ';" />';
     }).join('');
     return '<svg class="clock-arcs' + (compact ? ' is-small' : '') + '" viewBox="0 0 100 100" aria-hidden="true">' +
+      '<defs>' + defs + '</defs>' +
       '<circle class="clock-track" cx="50" cy="50" r="' + radius + '" style="stroke-width:' + stroke + ';"></circle>' +
       arcs +
     '</svg>';
@@ -924,6 +1038,43 @@
       x: (50 + radius * Math.cos(angle)).toFixed(3),
       y: (50 + radius * Math.sin(angle)).toFixed(3)
     };
+  }
+
+  function getActivityGradient(meta) {
+    return {
+      from: mixHex(meta.color, '#ffffff', 0.22),
+      to: mixHex(meta.color, '#5e4d3d', 0.18)
+    };
+  }
+
+  function getClockGradientId(event, compact, index) {
+    return 'clock-grad-' + (compact ? 's' : 'l') + '-' + index + '-' + event.startMinutes + '-' + event.endMinutes;
+  }
+
+  function mixHex(base, target, ratio) {
+    var from = hexToRgb(base);
+    var to = hexToRgb(target);
+    return rgbToHex({
+      r: Math.round(from.r + (to.r - from.r) * ratio),
+      g: Math.round(from.g + (to.g - from.g) * ratio),
+      b: Math.round(from.b + (to.b - from.b) * ratio)
+    });
+  }
+
+  function hexToRgb(value) {
+    var normalized = String(value || '').replace('#', '');
+    if (normalized.length !== 6) return { r: 127, g: 127, b: 127 };
+    return {
+      r: parseInt(normalized.slice(0, 2), 16),
+      g: parseInt(normalized.slice(2, 4), 16),
+      b: parseInt(normalized.slice(4, 6), 16)
+    };
+  }
+
+  function rgbToHex(rgb) {
+    return '#' + [rgb.r, rgb.g, rgb.b].map(function(part) {
+      return Math.max(0, Math.min(255, part)).toString(16).padStart(2, '0');
+    }).join('');
   }
 
   function parseTime(value) {

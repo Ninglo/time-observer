@@ -66,6 +66,9 @@ var Storage = (function() {
       dayKey: raw.dayKey || getTodayKey(),
       activity: raw.activity || 'study',
       note: raw.note || '',
+      tags: Array.isArray(raw.tags)
+        ? raw.tags.map(function(item) { return String(item || '').trim(); }).filter(Boolean)
+        : [],
       energy: raw.energy || '',
       mood: raw.mood || '',
       body: raw.body || '',
@@ -145,6 +148,7 @@ var Storage = (function() {
       event = normalizeEvent({
         activity: input.activity,
         note: input.note,
+        tags: input.tags,
         energy: input.energy,
         mood: input.mood,
         body: input.body,
@@ -159,6 +163,7 @@ var Storage = (function() {
       event = normalizeEvent({
         activity: input.activity,
         note: input.note,
+        tags: input.tags,
         energy: input.energy,
         mood: input.mood,
         body: input.body,

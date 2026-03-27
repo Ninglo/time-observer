@@ -166,6 +166,30 @@ button {
   box-shadow: var(--shadow);
 }
 
+.palette-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.palette-panel-head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.palette-title {
+  font-size: 13px;
+  color: var(--gray-700);
+  font-weight: 600;
+}
+
+.palette-note {
+  font-size: 12px;
+  color: var(--gray-500);
+  line-height: 1.45;
+}
+
 .palette-strip {
   display: flex;
   gap: 8px;
@@ -524,6 +548,25 @@ button {
   gap: var(--space-1);
 }
 
+.event-tags-row {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.event-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--gray-600);
+  background: rgba(248, 243, 234, 0.88);
+  border: 1px solid rgba(221, 217, 208, 0.55);
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -712,6 +755,17 @@ button {
   background: var(--chip-bg);
   color: var(--chip-text);
   border-color: color-mix(in srgb, var(--chip-text) 24%, white 76%);
+}
+
+.custom-activity-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.custom-activity-btn {
+  min-height: 42px;
+  padding: 0 16px;
 }
 
 .status-choice::before {
@@ -934,6 +988,10 @@ button {
     justify-content: center;
     text-align: center;
     padding: 0 10px;
+  }
+
+  .custom-activity-row {
+    grid-template-columns: 1fr;
   }
 
   .view-tab {
