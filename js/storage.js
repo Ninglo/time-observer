@@ -283,6 +283,8 @@ var Storage = (function() {
     createEvent: createEvent,
     deleteEvent: deleteEvent,
     createOuting: createOuting,
-    exportData: exportData
+    exportData: exportData,
+    pad: pad,
+    roundToFive: roundToFive
   };
 })();

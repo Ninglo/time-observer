@@ -910,21 +910,6 @@
     };
   }
 
-  function buildClockGradient(events) {
-    if (!events.length) {
-      return 'conic-gradient(from -90deg, rgba(236,232,224,0.92) 0deg 360deg)';
-    }
-
-    var segments = ['rgba(236,232,224,0.92) 0deg 360deg'];
-    events.forEach(function(event) {
-      var meta = getActivityMeta(event.activity);
-      var start = (event.startMinutes / 1440) * 360;
-      var end = (event.endMinutes / 1440) * 360;
-      segments.push(meta.color + ' ' + start + 'deg ' + end + 'deg');
-    });
-    return 'conic-gradient(from -90deg, ' + segments.join(', ') + ')';
-  }
-
   function renderClockArcs(events, compact) {
     if (!events.length) return '';
     var radius = compact ? 38 : 43;
@@ -1013,9 +998,7 @@
     return roundToFive(hours * 60 + minutes);
   }
 
-  function roundToFive(minutes) {
-    return Math.max(0, Math.min(1440, Math.round(minutes / 5) * 5));
-  }
+  var roundToFive = Storage.roundToFive;
 
   function formatDuration(minutes) {
     if (!minutes) return '0 分钟';
@@ -1042,9 +1025,7 @@
     return pad(date.getMonth() + 1) + '/' + pad(date.getDate()) + ' 周' + weekdays[date.getDay()];
   }
 
-  function pad(value) {
-    return String(value).padStart(2, '0');
-  }
+  var pad = Storage.pad;
 
   function escapeHtml(value) {
     return String(value || '')
