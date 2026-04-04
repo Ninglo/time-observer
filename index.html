@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>轻轻记录</title>
-  <link rel="stylesheet" href="css/style.css?v=20260327b">
+  <link rel="stylesheet" href="css/style.css?v=20260404">
 </head>
 <body>
   <header class="top-bar">
@@ -14,13 +14,31 @@
       <h1 class="app-title">轻轻记录</h1>
       <div class="app-kicker" id="top-date"></div>
     </div>
-    <button class="btn-icon" id="btn-export" title="导出数据" aria-label="导出数据">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-        <polyline points="7 10 12 15 17 10"></polyline>
-        <line x1="12" y1="15" x2="12" y2="3"></line>
-      </svg>
-    </button>
+    <div class="top-actions">
+      <div class="date-nav">
+        <button class="btn-icon" id="btn-prev-day" title="前一天" aria-label="前一天">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="btn-today" id="btn-today">今天</button>
+        <button class="btn-icon" id="btn-next-day" title="后一天" aria-label="后一天">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+      <button class="btn-icon" id="btn-sync" title="同步数据" aria-label="同步数据">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path>
+          <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"></path>
+        </svg>
+      </button>
+      <button class="btn-icon" id="btn-export" title="导出数据" aria-label="导出数据">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <main class="main-content" id="main-content"></main>
@@ -40,7 +58,8 @@
     </div>
   </div>
 
-  <script src="js/storage.js?v=20260327b"></script>
-  <script src="js/app.js?v=20260327b"></script>
+  <script src="js/storage.js?v=20260404"></script>
+  <script src="js/sync.js?v=20260404"></script>
+  <script src="js/app.js?v=20260404"></script>
 </body>
 </html>

@@ -4,7 +4,10 @@ var Storage = (function() {
   function getDefaultState() {
     return {
       events: [],
-      outings: []
+      outings: [],
+      journal: [],
+      reminders: [],
+      reviews: []
     };
   }
 
@@ -15,7 +18,10 @@ var Storage = (function() {
       var parsed = JSON.parse(raw);
       return {
         events: Array.isArray(parsed.events) ? parsed.events : [],
-        outings: Array.isArray(parsed.outings) ? parsed.outings : []
+        outings: Array.isArray(parsed.outings) ? parsed.outings : [],
+        journal: Array.isArray(parsed.journal) ? parsed.journal : [],
+        reminders: Array.isArray(parsed.reminders) ? parsed.reminders : [],
+        reviews: Array.isArray(parsed.reviews) ? parsed.reviews : []
       };
     } catch (error) {
       console.error('读取记录失败', error);
@@ -241,8 +247,8 @@ var Storage = (function() {
     return outing;
   }
 
-  function getTodaySummary() {
-    var events = getTodayEvents();
+  function getSummaryByDay(dayKey) {
+    var events = getEventsByDay(dayKey);
     var totalMinutes = events.reduce(function(sum, item) {
       return sum + item.duration;
     }, 0);
@@ -253,6 +259,100 @@ var Storage = (function() {
       blankMinutes: blankMinutes,
       latestEndMinutes: events.length ? events[events.length - 1].endMinutes : null
     };
+  }
+
+  function getTodaySummary() {
+    return getSummaryByDay(getTodayKey());
+  }
+
+  // --- Journal CRUD ---
+  function getJournalByDay(dayKey) {
+    var state = readState();
+    return state.journal.filter(function(item) {
+      return item.dayKey === dayKey;
+    }).sort(function(a, b) {
+      return (a.createdAt || '') < (b.createdAt || '') ? -1 : 1;
+    });
+  }
+
+  function createJournal(data) {
+    var state = readState();
+    var entry = {
+      id: data.id || generateId(),
+      dayKey: data.dayKey || getTodayKey(),
+      text: data.text || '',
+      mood: data.mood || '',
+      createdAt: data.createdAt || new Date().toISOString(),
+      updatedAt: data.updatedAt || new Date().toISOString()
+    };
+    state.journal.push(entry);
+    saveState(state);
+    return entry;
+  }
+
+  // --- Reminders CRUD ---
+  function getRemindersByDay(dayKey) {
+    var state = readState();
+    return state.reminders.filter(function(item) {
+      return item.dayKey === dayKey;
+    }).sort(function(a, b) {
+      return (a.createdAt || '') < (b.createdAt || '') ? -1 : 1;
+    });
+  }
+
+  function createReminder(data) {
+    var state = readState();
+    var entry = {
+      id: data.id || generateId(),
+      dayKey: data.dayKey || getTodayKey(),
+      text: data.text || '',
+      done: !!data.done,
+      createdAt: data.createdAt || new Date().toISOString(),
+      updatedAt: data.updatedAt || new Date().toISOString()
+    };
+    state.reminders.push(entry);
+    saveState(state);
+    return entry;
+  }
+
+  function updateReminder(id, changes) {
+    var state = readState();
+    for (var i = 0; i < state.reminders.length; i++) {
+      if (state.reminders[i].id === id) {
+        var keys = Object.keys(changes);
+        for (var j = 0; j < keys.length; j++) {
+          state.reminders[i][keys[j]] = changes[keys[j]];
+        }
+        state.reminders[i].updatedAt = new Date().toISOString();
+        break;
+      }
+    }
+    saveState(state);
+  }
+
+  // --- Reviews CRUD ---
+  function getReviewByDay(dayKey) {
+    var state = readState();
+    var matches = state.reviews.filter(function(item) {
+      return item.dayKey === dayKey;
+    });
+    return matches.length ? matches[matches.length - 1] : null;
+  }
+
+  function createReview(data) {
+    var state = readState();
+    var entry = {
+      id: data.id || generateId(),
+      dayKey: data.dayKey || getTodayKey(),
+      wakeUpMinutes: data.wakeUpMinutes || null,
+      summary: data.summary || '',
+      highlights: data.highlights || '',
+      createdAt: data.createdAt || new Date().toISOString(),
+      updatedAt: data.updatedAt || new Date().toISOString()
+    };
+    state.reviews.push(entry);
+    saveState(state);
+    return entry;
   }
 
   function exportData() {
@@ -274,16 +374,25 @@ var Storage = (function() {
 
   return {
     getTodayKey: getTodayKey,
+    getDayKey: getDayKey,
     getTodayEvents: getTodayEvents,
     getEventsByDay: getEventsByDay,
     getWeekKeys: getWeekKeys,
     getWeekEvents: getWeekEvents,
+    getSummaryByDay: getSummaryByDay,
     getTodaySummary: getTodaySummary,
     getRecentOuting: getRecentOuting,
     createEvent: createEvent,
     deleteEvent: deleteEvent,
     createOuting: createOuting,
     exportData: exportData,
+    getJournalByDay: getJournalByDay,
+    createJournal: createJournal,
+    getRemindersByDay: getRemindersByDay,
+    createReminder: createReminder,
+    updateReminder: updateReminder,
+    getReviewByDay: getReviewByDay,
+    createReview: createReview,
     pad: pad,
     roundToFive: roundToFive
   };

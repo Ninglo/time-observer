@@ -595,33 +595,155 @@ button {
   background: var(--gray-100);
 }
 
-.outing-card {
-  padding: 18px;
+/* --- Top bar actions & date nav --- */
+.top-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  gap: 4px;
 }
 
-.outing-title {
-  margin: 0;
+.date-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-today {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--gray-700);
+  background: rgba(241, 245, 234, 0.92);
+  border: 1px solid rgba(168, 197, 134, 0.35);
+}
+
+/* --- Status card (today summary) --- */
+.status-card {
+  padding: var(--space-4);
+}
+
+.status-card-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.status-clock-wrap {
+  flex-shrink: 0;
+}
+
+.status-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.status-headline {
   font-size: 17px;
   color: var(--gray-800);
 }
 
-.outing-text {
-  margin: 6px 0 0;
-  color: var(--gray-600);
+.status-wake {
+  margin-top: 6px;
   font-size: 14px;
+  color: var(--gray-600);
 }
 
-.last-reminder {
-  padding: 14px 16px;
-  border-radius: 14px;
-  background: rgba(255, 254, 249, 0.78);
-  border: 1px dashed rgba(212, 163, 115, 0.5);
+/* --- Card headers --- */
+.card-header {
+  padding: 0 0 12px;
+  font-size: 15px;
   color: var(--gray-700);
-  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --- Reminder card --- */
+.reminder-card {
+  padding: 18px;
+  background: rgba(255, 249, 230, 0.88);
+  border-color: rgba(224, 206, 160, 0.55);
+}
+
+.reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reminder-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--gray-800);
+}
+
+.reminder-item.is-done {
+  color: var(--gray-500);
+  text-decoration: line-through;
+}
+
+.reminder-check {
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.reminder-text-line {
+  line-height: 1.5;
+}
+
+/* --- Journal card --- */
+.journal-card {
+  padding: 18px;
+  background: rgba(255, 254, 249, 0.86);
+}
+
+.journal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.journal-item {
+  font-size: 15px;
+  color: var(--gray-700);
+  font-style: italic;
+  line-height: 1.65;
+}
+
+.journal-quote {
+  color: var(--gray-300);
+  font-size: 20px;
+  font-style: normal;
+}
+
+/* --- Review card --- */
+.review-card {
+  padding: 18px;
+  background: rgba(235, 243, 252, 0.82);
+  border-color: rgba(180, 205, 230, 0.55);
+}
+
+.review-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.review-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-700);
+  line-height: 1.65;
+}
+
+.review-highlights {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.65;
 }
 
 .empty-card {
@@ -1019,16 +1141,20 @@ button {
   }
 
   .dual-actions,
-  .modal-actions,
-  .outing-card {
+  .modal-actions {
     flex-direction: column;
     align-items: stretch;
   }
 
   .dual-actions .btn,
-  .modal-actions .btn,
-  .outing-card .btn {
+  .modal-actions .btn {
     width: 100%;
+  }
+
+  .status-card-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 
   .clock-card {
@@ -1128,15 +1254,6 @@ button {
     line-height: 1.55;
   }
 
-  .outing-card {
-    padding: 16px;
-  }
-
-  .outing-title {
-    font-size: 16px;
-  }
-
-  .outing-text,
   .empty-text {
     font-size: 13px;
   }

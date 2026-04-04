@@ -46,29 +46,14 @@
   };
 
   var DURATION_OPTIONS = [15, 30, 45, 60, 90, 120, 150, 180];
-  var HIGH_SPEND_LOCATIONS = ['mall', 'street', 'district'];
-  var UI_COPY = {
-    todayTitle: '',
-    todayNote: '',
-    quickAction: '记录此刻',
-    manualAction: '补记时间',
-    detailsTitle: '补记时间',
-    detailsNote: '',
-    plannedTitle: '',
-    plannedNote: ''
-  };
 
   var uiState = {
     activeView: 'today',
-    addMode: 'quick'
+    currentDayKey: Storage.getTodayKey()
   };
 
   var addFormState = getDefaultAddState();
   var pendingConflictPayload = null;
-  var outingState = {
-    location: '',
-    note: ''
-  };
 
   function getDefaultAddState() {
     return {
@@ -98,6 +83,27 @@
       Storage.exportData();
       showToast('已经导出本地数据');
     });
+    document.getElementById('btn-sync').addEventListener('click', function() {
+      showToast('正在同步...');
+      Sync.fetchAndMerge(function(err) {
+        if (err) {
+          showToast('同步失败，请稍后重试');
+        } else {
+          showToast('同步成功');
+          renderApp();
+        }
+      });
+    });
+    document.getElementById('btn-prev-day').addEventListener('click', function() {
+      navigateDay(-1);
+    });
+    document.getElementById('btn-next-day').addEventListener('click', function() {
+      navigateDay(1);
+    });
+    document.getElementById('btn-today').addEventListener('click', function() {
+      uiState.currentDayKey = Storage.getTodayKey();
+      renderApp();
+    });
     document.getElementById('modal-close').addEventListener('click', closeModal);
     document.getElementById('modal-overlay').addEventListener('click', function(event) {
       if (event.target === this) closeModal();
@@ -123,69 +129,196 @@
         showToast('这段时间已移除');
       }
 
-      if (action === 'open-outing') {
-        openOutingModal();
+      if (action === 'toggle-reminder') {
+        var rid = target.getAttribute('data-id');
+        var checked = target.getAttribute('data-done') === 'true';
+        Storage.updateReminder(rid, { done: !checked });
+        renderApp();
       }
     });
   }
 
+  function navigateDay(offset) {
+    var parts = uiState.currentDayKey.split('-');
+    var date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    date.setDate(date.getDate() + offset);
+    uiState.currentDayKey = Storage.getDayKey(date);
+    renderApp();
+  }
+
   function renderApp() {
     var root = document.getElementById('main-content');
-    var summary = Storage.getTodaySummary();
-    var todayEvents = Storage.getTodayEvents();
-    var weekDays = Storage.getWeekEvents();
-    var recentOuting = Storage.getRecentOuting();
-    updateTopBar();
+    var dayKey = uiState.currentDayKey;
+    var events = Storage.getEventsByDay(dayKey);
+    var summary = Storage.getSummaryByDay(dayKey);
+    var journal = Storage.getJournalByDay(dayKey);
+    var reminders = Storage.getRemindersByDay(dayKey);
+    var review = Storage.getReviewByDay(dayKey);
+    var weekDays = Storage.getWeekEvents(dayKey + 'T00:00:00');
+    updateTopBar(dayKey);
 
     root.innerHTML =
       '<div class="page-stack">' +
         renderViewSwitch() +
         (uiState.activeView === 'today'
-          ? renderTodayView(todayEvents, summary, recentOuting)
+          ? renderDayView(dayKey, events, summary, journal, reminders, review)
           : renderWeekView(weekDays)) +
       '</div>';
   }
 
-  function updateTopBar() {
+  function updateTopBar(dayKey) {
+    var parts = dayKey.split('-');
+    var date = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
     var topDate = document.getElementById('top-date');
-    if (!topDate) return;
-    topDate.textContent = formatLongDate(new Date());
-  }
+    if (topDate) topDate.textContent = formatLongDate(date);
 
-  function renderMetric(label, value, className) {
-    return '' +
-      '<div class="metric-card ' + className + '">' +
-        '<div class="metric-label">' + escapeHtml(label) + '</div>' +
-        '<div class="metric-value">' + escapeHtml(value) + '</div>' +
-      '</div>';
+    var todayBtn = document.getElementById('btn-today');
+    if (todayBtn) {
+      todayBtn.style.display = dayKey === Storage.getTodayKey() ? 'none' : '';
+    }
   }
 
   function renderViewSwitch() {
     return '' +
       '<section class="view-switch">' +
-        '<button class="view-tab' + (uiState.activeView === 'today' ? ' is-active' : '') + '" data-action="switch-view" data-view="today">今日</button>' +
+        '<button class="view-tab' + (uiState.activeView === 'today' ? ' is-active' : '') + '" data-action="switch-view" data-view="today">日视图</button>' +
         '<button class="view-tab' + (uiState.activeView === 'week' ? ' is-active' : '') + '" data-action="switch-view" data-view="week">本周</button>' +
       '</section>';
   }
 
-  function renderTodayView(events, summary, recentOuting) {
+  function renderDayView(dayKey, events, summary, journal, reminders, review) {
+    var isToday = dayKey === Storage.getTodayKey();
     return '' +
-      '<section class="section">' +
-        (UI_COPY.todayTitle || UI_COPY.todayNote
-          ? '<div class="section-head">' +
-              (UI_COPY.todayTitle ? '<h3 class="section-title">' + UI_COPY.todayTitle + '</h3>' : '') +
-              (UI_COPY.todayNote ? '<div class="section-note">' + UI_COPY.todayNote + '</div>' : '') +
-            '</div>'
-          : '') +
-        renderClockCard(events, summary, false) +
-        '<div class="dual-actions">' +
-          '<button class="btn btn-primary" data-action="open-add" data-mode="quick">' + UI_COPY.quickAction + '</button>' +
-          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">' + UI_COPY.manualAction + '</button>' +
+      renderStatusCard(events, summary, review) +
+      renderRemindersSection(reminders) +
+      renderTimeline(events, isToday) +
+      renderJournalSection(journal) +
+      renderReviewSection(review);
+  }
+
+  function renderStatusCard(events, summary, review) {
+    var wakeUpText = '';
+    if (review && review.wakeUpMinutes) {
+      wakeUpText = '<div class="status-wake">起床时间: ' + escapeHtml(formatTime(review.wakeUpMinutes)) + '</div>';
+    }
+    return '' +
+      '<section class="card status-card">' +
+        '<div class="status-card-inner">' +
+          '<div class="status-clock-wrap">' +
+            renderClockMini(events) +
+          '</div>' +
+          '<div class="status-info">' +
+            '<div class="status-headline">' +
+              '今日 ' + escapeHtml(String(summary.eventCount)) + ' 项活动 / ' + escapeHtml(formatDuration(summary.totalMinutes)) +
+            '</div>' +
+            wakeUpText +
+          '</div>' +
         '</div>' +
-        renderPlannedSection(recentOuting) +
-        renderEventList(events) +
-        renderSummaryStrip(summary) +
+        renderActivitySummary(events) +
       '</section>';
+  }
+
+  function renderClockMini(events) {
+    var summary = getSummaryFromEvents(events);
+    return '' +
+      '<div class="clock-face is-small">' +
+        renderClockArcs(events, true) +
+        '<div class="clock-core is-small"></div>' +
+        renderClockMarkers(true) +
+        '<div class="clock-center is-small">' +
+          '<div class="clock-total">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
+          '<div class="clock-caption">已记录</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderRemindersSection(reminders) {
+    if (!reminders.length) return '';
+    var html =
+      '<section class="card reminder-card">' +
+        '<div class="card-header">提醒事项</div>' +
+        '<div class="reminder-list">';
+    reminders.forEach(function(item) {
+      var doneClass = item.done ? ' is-done' : '';
+      html +=
+        '<div class="reminder-item' + doneClass + '" data-action="toggle-reminder" data-id="' + escapeHtml(item.id) + '" data-done="' + (item.done ? 'true' : 'false') + '">' +
+          '<span class="reminder-check">' + (item.done ? '☑' : '☐') + '</span>' +
+          '<span class="reminder-text-line">' + escapeHtml(item.text) + '</span>' +
+        '</div>';
+    });
+    html += '</div></section>';
+    return html;
+  }
+
+  function renderTimeline(events, isToday) {
+    var html =
+      '<section class="section">' +
+        '<div class="section-head">' +
+          '<h3 class="section-title">活动时间线</h3>' +
+        '</div>';
+
+    if (!events.length) {
+      html +=
+        '<div class="card empty-card">' +
+          '<p class="empty-text">还没有记录，开始你的一天吧。</p>' +
+        '</div>';
+    } else {
+      html += '<div class="event-list">';
+      events.forEach(function(event) {
+        html += renderEventCard(event);
+      });
+      html += '</div>';
+    }
+
+    if (isToday) {
+      html +=
+        '<div class="dual-actions">' +
+          '<button class="btn btn-primary" data-action="open-add" data-mode="quick">记录此刻</button>' +
+          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
+        '</div>';
+    } else {
+      html +=
+        '<div class="dual-actions">' +
+          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
+        '</div>';
+    }
+
+    html += '</section>';
+    return html;
+  }
+
+  function renderJournalSection(journal) {
+    if (!journal.length) return '';
+    var html =
+      '<section class="card journal-card">' +
+        '<div class="card-header">今日随想</div>' +
+        '<div class="journal-list">';
+    journal.forEach(function(item) {
+      html +=
+        '<div class="journal-item">' +
+          '<span class="journal-quote">"</span>' +
+          '<span class="journal-text">' + escapeHtml(item.text) + '</span>' +
+          '<span class="journal-quote">"</span>' +
+        '</div>';
+    });
+    html += '</div></section>';
+    return html;
+  }
+
+  function renderReviewSection(review) {
+    if (!review) return '';
+    var html =
+      '<section class="card review-card">' +
+        '<div class="card-header">每日复盘</div>' +
+        '<div class="review-body">';
+    if (review.summary) {
+      html += '<p class="review-text">' + escapeHtml(review.summary) + '</p>';
+    }
+    if (review.highlights) {
+      html += '<p class="review-highlights">' + escapeHtml(review.highlights) + '</p>';
+    }
+    html += '</div></section>';
+    return html;
   }
 
   function renderSummaryStrip(summary) {
@@ -195,6 +328,14 @@
         renderMetric('记录', formatDuration(summary.totalMinutes), 'is-blue') +
         renderMetric('留白', formatDuration(summary.blankMinutes), 'is-orange') +
       '</section>';
+  }
+
+  function renderMetric(label, value, className) {
+    return '' +
+      '<div class="metric-card ' + className + '">' +
+        '<div class="metric-label">' + escapeHtml(label) + '</div>' +
+        '<div class="metric-value">' + escapeHtml(value) + '</div>' +
+      '</div>';
   }
 
   function renderWeekView(weekDays) {
@@ -248,15 +389,11 @@
   }
 
   function renderActivitySummary(events) {
-    if (!events.length) {
-      return '';
-    }
-
+    if (!events.length) return '';
     var totals = {};
     events.forEach(function(event) {
       totals[event.activity] = (totals[event.activity] || 0) + event.duration;
     });
-
     return '' +
       '<div class="clock-legend">' +
         Object.keys(totals).map(function(key) {
@@ -271,30 +408,6 @@
       '</div>';
   }
 
-  function renderEventList(events) {
-    var html =
-      '<section class="section">' +
-        '<div class="section-head">' +
-          '<h3 class="section-title">' + UI_COPY.detailsTitle + '</h3>' +
-          (UI_COPY.detailsNote ? '<div class="section-note">' + UI_COPY.detailsNote + '</div>' : '') +
-        '</div>';
-
-    if (!events.length) {
-      html +=
-        '<div class="card empty-card">' +
-          '<p class="empty-text">Any action is often better than no action.</p>' +
-        '</div>';
-      return html + '</section>';
-    }
-
-    html += '<div class="event-list">';
-    events.forEach(function(event) {
-      html += renderEventCard(event);
-    });
-    html += '</div></section>';
-    return html;
-  }
-
   function renderEventCard(event) {
     var statuses = [];
     if (event.energy) statuses.push(renderStatusPill('energy', event.energy));
@@ -303,6 +416,7 @@
     var tags = Array.isArray(event.tags) ? event.tags.filter(Boolean) : [];
 
     var meta = getActivityMeta(event.activity);
+    var modeLabel = event.inputMode === 'ai' ? 'AI' : (event.inputMode === 'manual' ? '补记' : '刚做完');
     return '' +
       '<article class="card event-card">' +
         '<div class="event-top">' +
@@ -312,7 +426,7 @@
           '</div>' +
           '<div class="event-side">' +
             '<div class="event-duration">' + escapeHtml(formatDuration(event.duration)) + '</div>' +
-            '<div class="event-mode">' + (event.inputMode === 'manual' ? '补记' : '刚做完') + '</div>' +
+            '<div class="event-mode">' + escapeHtml(modeLabel) + '</div>' +
             '<button class="event-delete" data-action="delete-event" data-id="' + escapeHtml(event.id) + '" aria-label="删除">' +
               '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                 '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path>' +
@@ -336,7 +450,7 @@
   function openAddModal(mode) {
     addFormState = getDefaultAddState();
     addFormState.mode = mode || 'quick';
-    uiState.addMode = addFormState.mode;
+    addFormState.dayKey = uiState.currentDayKey;
     if (addFormState.mode === 'quick') {
       var now = new Date();
       var endMinutes = roundToFive(now.getHours() * 60 + now.getMinutes());
@@ -490,7 +604,6 @@
         addFormState.tags = document.getElementById('event-tags').value.trim();
         addFormState.customActivity = document.getElementById('custom-activity-input').value.trim();
         addFormState.mode = node.getAttribute('data-mode-choice');
-        uiState.addMode = addFormState.mode;
         setModal(addFormState.mode === 'manual' ? '补记时间' : '记下一段', renderAddForm());
         bindAddFormEvents();
       });
@@ -624,177 +737,6 @@
       var group = node.getAttribute('data-status-group');
       var value = node.getAttribute('data-status-value');
       node.classList.toggle('is-selected', addFormState[group] === value);
-    });
-  }
-
-  function renderPlannedSection(recentOuting) {
-    var html =
-      '<section class="section">' +
-        (UI_COPY.plannedTitle || UI_COPY.plannedNote
-          ? '<div class="section-head">' +
-              (UI_COPY.plannedTitle ? '<h3 class="section-title">' + UI_COPY.plannedTitle + '</h3>' : '') +
-              (UI_COPY.plannedNote ? '<div class="section-note">' + UI_COPY.plannedNote + '</div>' : '') +
-            '</div>'
-          : '') +
-        '<div class="card outing-card">' +
-          '<div>' +
-            '<p class="outing-title">向未知出发</p>' +
-            '<p class="outing-text">To infinity and beyond.</p>' +
-          '</div>' +
-          '<button class="btn btn-soft" data-action="open-outing">马上行动</button>' +
-        '</div>';
-
-    if (recentOuting) {
-      html += '<div class="last-reminder">' + escapeHtml(renderOutingSummary(recentOuting)) + '</div>';
-    }
-
-    return html + '</section>';
-  }
-
-  function renderOutingSummary(outing) {
-    var locationMap = {
-      home: '在家附近',
-      office: '公司周边',
-      mall: '商场',
-      street: '商业街',
-      district: '商业区',
-      park: '公园',
-      friend: '朋友那边'
-    };
-    var decisionMap = {
-      browse: '只是逛逛',
-      buy: '准备买点东西',
-      continue: '继续购买',
-      rethink: '再想想',
-      direct: '直接出门'
-    };
-    return '最近一次提醒：' + (locationMap[outing.location] || outing.location) + ' · ' + (decisionMap[outing.decision] || outing.decision);
-  }
-
-  function openOutingModal() {
-    outingState = { location: '', note: '' };
-    setModal('出门前记录', renderOutingForm());
-    bindOutingFormEvents();
-  }
-
-  function renderOutingForm() {
-    return '' +
-      '<form class="modal-stack" id="outing-form">' +
-        '<div class="field-group">' +
-          '<div class="field-label">这次要去哪里</div>' +
-          '<select class="select-input" id="outing-location">' +
-            '<option value="">选择一个地点</option>' +
-            '<option value="home">在家附近</option>' +
-            '<option value="office">公司周边</option>' +
-            '<option value="mall">商场</option>' +
-            '<option value="street">商业街</option>' +
-            '<option value="district">商业区</option>' +
-            '<option value="park">公园</option>' +
-            '<option value="friend">朋友那边</option>' +
-          '</select>' +
-        '</div>' +
-        '<div class="field-group">' +
-          '<div class="field-label">一句备注</div>' +
-          '<input class="text-input" id="outing-note" maxlength="40" placeholder="可选，比如顺路买点东西">' +
-        '</div>' +
-        '<div class="modal-actions">' +
-          '<button type="button" class="btn btn-secondary" id="cancel-outing">取消</button>' +
-          '<button type="submit" class="btn btn-primary">继续</button>' +
-        '</div>' +
-      '</form>';
-  }
-
-  function bindOutingFormEvents() {
-    document.getElementById('cancel-outing').addEventListener('click', closeModal);
-    document.getElementById('outing-form').addEventListener('submit', function(event) {
-      event.preventDefault();
-      outingState.location = document.getElementById('outing-location').value;
-      outingState.note = document.getElementById('outing-note').value.trim();
-      if (!outingState.location) {
-        showToast('先选一个地点');
-        return;
-      }
-      if (HIGH_SPEND_LOCATIONS.indexOf(outingState.location) !== -1) {
-        openReminderLevelOne();
-      } else {
-        Storage.createOuting({
-          location: outingState.location,
-          note: outingState.note,
-          decision: 'direct',
-          reminderStage: 0
-        });
-        closeModal();
-        renderApp();
-        showToast('已经记下这次出门');
-      }
-    });
-  }
-
-  function openReminderLevelOne() {
-    setModal('先确认一下', '' +
-      '<div class="modal-stack">' +
-        '<div class="reminder-box">' +
-          '<h3 class="reminder-title">先确认一下</h3>' +
-          '<p class="reminder-text">这里是高消费区，你是来逛，还是准备买点东西？</p>' +
-          '<div class="tiny-note">只是提醒，不带评价。</div>' +
-        '</div>' +
-        '<div class="modal-actions">' +
-          '<button class="btn btn-secondary" id="outing-browse">我只是逛逛</button>' +
-          '<button class="btn btn-primary" id="outing-buy">我打算买</button>' +
-        '</div>' +
-      '</div>');
-
-    document.getElementById('outing-browse').addEventListener('click', function() {
-      Storage.createOuting({
-        location: outingState.location,
-        note: outingState.note,
-        decision: 'browse',
-        reminderStage: 1
-      });
-      closeModal();
-      renderApp();
-      showToast('好的，轻松去逛逛');
-    });
-
-    document.getElementById('outing-buy').addEventListener('click', openReminderLevelTwo);
-  }
-
-  function openReminderLevelTwo() {
-    setModal('再停一下', '' +
-      '<div class="modal-stack">' +
-        '<div class="reminder-box">' +
-          '<p class="reminder-text">这件东西 ≈ 一顿在家火锅（约250元）</p>' +
-          '<div class="reminder-highlight">你更想要：一个短暂的满足，还是一顿稳定的快乐？</div>' +
-          '<div class="tiny-note">不阻止你，只给你一个停顿。</div>' +
-        '</div>' +
-        '<div class="modal-actions">' +
-          '<button class="btn btn-secondary" id="outing-rethink">再想想</button>' +
-          '<button class="btn btn-primary" id="outing-continue">继续购买</button>' +
-        '</div>' +
-      '</div>');
-
-    document.getElementById('outing-rethink').addEventListener('click', function() {
-      Storage.createOuting({
-        location: outingState.location,
-        note: outingState.note,
-        decision: 'rethink',
-        reminderStage: 2
-      });
-      closeModal();
-      renderApp();
-      showToast('好，先把这个念头放一放');
-    });
-
-    document.getElementById('outing-continue').addEventListener('click', function() {
-      Storage.createOuting({
-        location: outingState.location,
-        note: outingState.note,
-        decision: 'continue',
-        reminderStage: 2
-      });
-      closeModal();
-      renderApp();
-      showToast('收到，继续就好');
     });
   }
 
