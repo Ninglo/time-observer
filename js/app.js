@@ -1,5 +1,5 @@
 (function() {
-  var BUILD_VERSION = '2026.04.04e';
+  var BUILD_VERSION = '2026.04.04f';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
@@ -75,6 +75,11 @@
   }
 
   function init() {
+    // One-time: clear stale E2E test data from localStorage
+    if (!localStorage.getItem('_cleared_test_data_v1')) {
+      localStorage.removeItem('quiet_life_records_v2');
+      localStorage.setItem('_cleared_test_data_v1', '1');
+    }
     bindGlobalEvents();
     renderVersionFooter();
     // Show loading state first, then sync, then render
