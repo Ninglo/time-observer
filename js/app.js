@@ -854,6 +854,13 @@
     };
   }
 
+  function getActivityGradient(meta) {
+    return {
+      from: mixHex(meta.color, '#ffffff', 0.2),
+      to: meta.color
+    };
+  }
+
   function buildConicGradient(events) {
     var trackColor = '#e8e4df';
     if (!events.length) return trackColor;
