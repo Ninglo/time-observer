@@ -377,7 +377,7 @@ button {
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
-  background: #e8e4df;
+  background: #f0ece6;
   box-shadow:
     0 0 0 1px rgba(221, 217, 208, 0.35),
     0 2px 8px rgba(120, 100, 80, 0.08),
@@ -461,31 +461,28 @@ button {
 .clock-marker.marker-3.is-small { left: 6px; }
 
 .clock-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  align-content: flex-start;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 8px;
 }
 
 .legend-chip {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 999px;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
   background: var(--legend-bg);
   color: var(--legend-text);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  border: 1px solid color-mix(in srgb, var(--legend-text) 12%, transparent);
 }
 
 .legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .empty-legend {
@@ -691,75 +688,44 @@ button {
   background: rgba(225, 236, 212, 0.95);
 }
 
-/* --- Quick input card --- */
-.quick-input-card {
-  padding: 12px 14px;
-}
-
-.quick-input-row {
+/* --- Note buttons (write / remind) --- */
+.quick-input-btns {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 10px;
+  padding: 0 4px;
 }
 
-.quick-input-text {
+.btn-note {
   flex: 1;
-  min-height: 40px;
-  padding: 0 14px;
-  border: 1px solid rgba(221, 217, 208, 0.6);
-  border-radius: 12px;
-  background: rgba(255, 254, 249, 0.9);
-  color: var(--gray-800);
+  padding: 12px 0;
+  border-radius: 14px;
   font-size: 14px;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-
-.quick-input-text:focus {
-  border-color: rgba(168, 197, 134, 0.7);
-}
-
-.quick-input-text::placeholder {
-  color: var(--gray-500);
-}
-
-.quick-input-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.quick-input-btn {
-  min-width: 44px;
-  min-height: 40px;
-  padding: 0 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   border: none;
   cursor: pointer;
-  transition: transform 0.12s ease, opacity 0.12s ease;
+  transition: transform 0.12s ease;
+  text-align: center;
 }
 
-.quick-input-btn:active {
-  transform: scale(0.95);
+.btn-note:active {
+  transform: scale(0.97);
 }
 
-.quick-input-btn.is-journal {
-  background: rgba(241, 245, 234, 0.95);
-  color: #6a9e52;
-  border: 1px solid rgba(168, 197, 134, 0.4);
+.btn-note.is-journal {
+  background: rgba(238, 248, 242, 0.95);
+  color: #5a9a62;
+  border: 1px solid rgba(142, 205, 160, 0.35);
 }
 
-.quick-input-btn.is-reminder {
-  background: rgba(255, 250, 235, 0.95);
-  color: #b08a30;
-  border: 1px solid rgba(218, 198, 148, 0.5);
+.btn-note.is-reminder {
+  background: rgba(255, 250, 238, 0.95);
+  color: #a08030;
+  border: 1px solid rgba(218, 198, 148, 0.35);
 }
 
 /* --- Status card (today summary) --- */
 .status-card {
-  padding: var(--space-4);
+  padding: 18px;
   background: linear-gradient(160deg, rgba(255, 254, 249, 0.92) 0%, rgba(248, 246, 238, 0.90) 100%);
   box-shadow: var(--shadow-md);
 }
@@ -780,14 +746,14 @@ button {
 }
 
 .status-headline {
-  font-size: 18px;
+  font-size: 15px;
   color: var(--gray-800);
   font-weight: 500;
 }
 
 .status-wake {
-  margin-top: 6px;
-  font-size: 14px;
+  margin-top: 4px;
+  font-size: 13px;
   color: var(--gray-600);
 }
 
@@ -1338,9 +1304,9 @@ button {
   }
 
   .status-card-inner {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    text-align: center;
+    gap: 14px;
   }
 
   .clock-card {
@@ -1377,14 +1343,14 @@ button {
   }
 
   .clock-legend {
-    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px 6px;
   }
 
   .legend-chip {
-    width: 100%;
-    justify-content: flex-start;
-    padding: 9px 12px;
-    font-size: 12px;
+    padding: 5px 8px;
+    font-size: 11px;
+    gap: 5px;
   }
 
   .week-grid {

@@ -1,5 +1,5 @@
 (function() {
-  var BUILD_VERSION = '2026.04.04f';
+  var BUILD_VERSION = '2026.04.04g';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
@@ -12,14 +12,14 @@
     { value: 'nothing', label: '摆烂', icon: '躺' }
   ];
   var ACTIVITY_PALETTES = {
-    study: { color: '#9bbca5', soft: '#f0f7f2' },
-    coding: { color: '#98b4c7', soft: '#eff5f9' },
-    work: { color: '#b5adc9', soft: '#f4f1f9' },
-    exercise: { color: '#d2b595', soft: '#faf4eb' },
-    social: { color: '#d5aab5', soft: '#faeff3' },
-    cook: { color: '#cfaa96', soft: '#faf1ec' },
-    rest: { color: '#aab8ca', soft: '#f0f4f8' },
-    nothing: { color: '#c1b9af', soft: '#f5f2ee' }
+    study: { color: '#8ecda0', soft: '#eef8f2' },
+    coding: { color: '#8abde0', soft: '#ecf4fb' },
+    work: { color: '#b8a8e0', soft: '#f2eff9' },
+    exercise: { color: '#f0a898', soft: '#fdf0ec' },
+    social: { color: '#eca8bc', soft: '#fdeef4' },
+    cook: { color: '#e8c498', soft: '#faf3ea' },
+    rest: { color: '#a0bce0', soft: '#edf3fb' },
+    nothing: { color: '#ccc4ba', soft: '#f4f1ed' }
   };
 
   var STATUS_OPTIONS = {
@@ -151,22 +151,6 @@
     });
 
     document.body.addEventListener('click', function(event) {
-      // Quick input buttons
-      if (event.target.id === 'btn-add-journal' || event.target.id === 'btn-add-reminder') {
-        var input = document.getElementById('quick-input');
-        var text = input ? input.value.trim() : '';
-        if (!text) { showToast('先写点什么'); return; }
-        if (event.target.id === 'btn-add-journal') {
-          Storage.createJournal({ dayKey: uiState.currentDayKey, text: text });
-          showToast('随想已记下');
-        } else {
-          Storage.createReminder({ dayKey: uiState.currentDayKey, text: text });
-          showToast('提醒已添加');
-        }
-        renderApp();
-        return;
-      }
-
       var target = event.target.closest('[data-action]');
       if (!target) return;
       var action = target.getAttribute('data-action');
@@ -190,6 +174,30 @@
         var rid = target.getAttribute('data-id');
         var checked = target.getAttribute('data-done') === 'true';
         Storage.updateReminder(rid, { done: !checked });
+        renderApp();
+      }
+
+      if (action === 'open-journal') {
+        openNoteModal('journal');
+      }
+
+      if (action === 'open-reminder') {
+        openNoteModal('reminder');
+      }
+
+      if (action === 'submit-note') {
+        var noteType = target.getAttribute('data-note-type');
+        var textarea = document.getElementById('note-textarea');
+        var text = textarea ? textarea.value.trim() : '';
+        if (!text) { showToast('先写点什么'); return; }
+        if (noteType === 'journal') {
+          Storage.createJournal({ dayKey: uiState.currentDayKey, text: text });
+          showToast('已记下');
+        } else {
+          Storage.createReminder({ dayKey: uiState.currentDayKey, text: text });
+          showToast('提醒已添加');
+        }
+        closeModal();
         renderApp();
       }
     });
@@ -257,14 +265,9 @@
 
   function renderQuickInput(dayKey) {
     return '' +
-      '<section class="card quick-input-card">' +
-        '<div class="quick-input-row">' +
-          '<input class="quick-input-text" id="quick-input" type="text" maxlength="100" placeholder="写一句随想，或加一条提醒...">' +
-          '<div class="quick-input-actions">' +
-            '<button class="quick-input-btn is-journal" id="btn-add-journal" title="记为随想">记</button>' +
-            '<button class="quick-input-btn is-reminder" id="btn-add-reminder" title="加为提醒">提醒</button>' +
-          '</div>' +
-        '</div>' +
+      '<section class="quick-input-btns">' +
+        '<button class="btn-note is-journal" data-action="open-journal">写点什么</button>' +
+        '<button class="btn-note is-reminder" data-action="open-reminder">提醒一下</button>' +
       '</section>';
   }
 
@@ -518,6 +521,25 @@
     if (!option) return '';
     var labelMap = { energy: '精力', mood: '情绪', body: '身体' };
     return '<span class="status-pill" style="background:' + option.soft + '; color:' + option.text + ';">' + escapeHtml(labelMap[group] + ' · ' + option.label) + '</span>';
+  }
+
+  function openNoteModal(type) {
+    var isJournal = type === 'journal';
+    var title = isJournal ? '写点什么' : '提醒一下';
+    var placeholder = isJournal ? '此刻的想法、感受、碎碎念...' : '提醒自己要做的事...';
+    var btnLabel = isJournal ? '记下来' : '添加提醒';
+    setModal(title, '' +
+      '<div class="modal-stack">' +
+        '<textarea class="text-area" id="note-textarea" maxlength="500" rows="4" placeholder="' + escapeHtml(placeholder) + '" autofocus></textarea>' +
+        '<div class="modal-actions">' +
+          '<button class="btn btn-secondary" data-action="close-modal" onclick="document.getElementById(\'modal-overlay\').classList.remove(\'show\')">取消</button>' +
+          '<button class="btn btn-primary" data-action="submit-note" data-note-type="' + type + '">' + escapeHtml(btnLabel) + '</button>' +
+        '</div>' +
+      '</div>');
+    setTimeout(function() {
+      var ta = document.getElementById('note-textarea');
+      if (ta) ta.focus();
+    }, 100);
   }
 
   function openAddModal(mode) {
@@ -933,7 +955,7 @@
   }
 
   function buildConicGradient(events) {
-    var trackColor = '#e8e4df';
+    var trackColor = '#f0ece6';
     if (!events.length) return trackColor;
 
     var sorted = events.slice().sort(function(a, b) {
@@ -950,7 +972,7 @@
 
       var meta = getActivityMeta(event.activity);
       var baseColor = meta.color;
-      var lightColor = mixHex(baseColor, '#ffffff', 0.25);
+      var lightColor = mixHex(baseColor, '#ffffff', 0.35);
 
       // Track gap before this event
       if (startDeg > lastEndDeg + 0.5) {
