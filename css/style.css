@@ -255,6 +255,21 @@ button {
   gap: var(--space-2);
 }
 
+.quick-actions {
+  display: flex;
+  gap: var(--space-3);
+  padding: 0 var(--space-3);
+}
+
+.quick-actions .btn {
+  flex: 1;
+  padding: 14px 0;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 14px;
+  letter-spacing: 0.5px;
+}
+
 .btn-icon {
   width: 40px;
   height: 40px;
@@ -322,35 +337,17 @@ button {
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
-  background: rgba(236, 232, 224, 0.92);
-  box-shadow: inset 0 0 0 1px rgba(221, 217, 208, 0.5), 0 10px 28px rgba(120, 100, 80, 0.08);
-}
-
-.clock-arcs {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
-
-.clock-track {
-  fill: none;
-  stroke: rgba(236, 232, 224, 0.96);
-}
-
-.clock-arcs path {
-  fill: none;
-  stroke-linecap: butt;
+  background: #e8e4df;
+  box-shadow: 0 2px 16px rgba(120, 100, 80, 0.10), 0 0 0 1px rgba(221, 217, 208, 0.4);
 }
 
 .clock-core {
   position: absolute;
-  inset: 34px;
+  inset: 30px;
   z-index: 1;
   border-radius: 50%;
-  background: rgba(255, 254, 249, 0.94);
-  box-shadow: inset 0 0 0 1px rgba(221, 217, 208, 0.55);
+  background: rgba(255, 254, 249, 0.97);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
 }
 
 .clock-face.is-small {
@@ -359,12 +356,12 @@ button {
 }
 
 .clock-core.is-small {
-  inset: 24px;
+  inset: 20px;
 }
 
 .clock-center {
   position: absolute;
-  inset: 34px;
+  inset: 30px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -374,7 +371,7 @@ button {
 }
 
 .clock-center.is-small {
-  inset: 24px;
+  inset: 20px;
 }
 
 .clock-total {

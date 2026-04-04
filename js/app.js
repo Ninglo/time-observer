@@ -190,10 +190,25 @@
     var isToday = dayKey === Storage.getTodayKey();
     return '' +
       renderStatusCard(events, summary, review) +
+      renderQuickActions(isToday) +
       renderRemindersSection(reminders) +
       renderTimeline(events, isToday) +
       renderJournalSection(journal) +
       renderReviewSection(review);
+  }
+
+  function renderQuickActions(isToday) {
+    if (isToday) {
+      return '' +
+        '<section class="quick-actions">' +
+          '<button class="btn btn-primary" data-action="open-add" data-mode="quick">记录此刻</button>' +
+          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
+        '</section>';
+    }
+    return '' +
+      '<section class="quick-actions">' +
+        '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
+      '</section>';
   }
 
   function renderStatusCard(events, summary, review) {
@@ -220,9 +235,9 @@
 
   function renderClockMini(events) {
     var summary = getSummaryFromEvents(events);
+    var gradientStyle = buildConicGradient(events);
     return '' +
-      '<div class="clock-face is-small">' +
-        renderClockArcs(events, true) +
+      '<div class="clock-face is-small" style="background:' + gradientStyle + ';">' +
         '<div class="clock-core is-small"></div>' +
         renderClockMarkers(true) +
         '<div class="clock-center is-small">' +
@@ -268,19 +283,6 @@
         html += renderEventCard(event);
       });
       html += '</div>';
-    }
-
-    if (isToday) {
-      html +=
-        '<div class="dual-actions">' +
-          '<button class="btn btn-primary" data-action="open-add" data-mode="quick">记录此刻</button>' +
-          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
-        '</div>';
-    } else {
-      html +=
-        '<div class="dual-actions">' +
-          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
-        '</div>';
     }
 
     html += '</section>';
@@ -364,11 +366,11 @@
 
   function renderClockCard(events, summary, compact) {
     var sizeClass = compact ? ' clock-card-compact' : '';
+    var gradientStyle = buildConicGradient(events);
     return '' +
       '<section class="card clock-card' + sizeClass + '">' +
         '<div class="clock-wrap">' +
-          '<div class="clock-face' + (compact ? ' is-small' : '') + '">' +
-            renderClockArcs(events, compact) +
+          '<div class="clock-face' + (compact ? ' is-small' : '') + '" style="background:' + gradientStyle + ';">' +
             '<div class="clock-core' + (compact ? ' is-small' : '') + '"></div>' +
             renderClockMarkers(compact) +
             '<div class="clock-center' + (compact ? ' is-small' : '') + '">' +
@@ -852,57 +854,47 @@
     };
   }
 
-  function renderClockArcs(events, compact) {
-    if (!events.length) return '';
-    var radius = compact ? 38 : 43;
-    var stroke = compact ? 10 : 12;
-    var defs = events.map(function(event, index) {
+  function buildConicGradient(events) {
+    var trackColor = '#e8e4df';
+    if (!events.length) return trackColor;
+
+    var sorted = events.slice().sort(function(a, b) {
+      return a.startMinutes - b.startMinutes;
+    });
+
+    var stops = [];
+    var lastEndDeg = 0;
+
+    sorted.forEach(function(event) {
+      var startDeg = (event.startMinutes / 1440) * 360;
+      var endDeg = (event.endMinutes / 1440) * 360;
+      if (endDeg <= startDeg) return;
+
       var meta = getActivityMeta(event.activity);
-      var gradient = getActivityGradient(meta);
-      var gradientId = getClockGradientId(event, compact, index);
-      return '<linearGradient id="' + gradientId + '" x1="0%" y1="0%" x2="100%" y2="100%">' +
-        '<stop offset="0%" stop-color="' + gradient.from + '"></stop>' +
-        '<stop offset="100%" stop-color="' + gradient.to + '"></stop>' +
-      '</linearGradient>';
-    }).join('');
-    var arcs = events.map(function(event, index) {
-      var gradientId = getClockGradientId(event, compact, index);
-      return '<path d="' + describeArc(radius, event.startMinutes, event.endMinutes) + '" style="stroke:url(#' + gradientId + '); stroke-width:' + stroke + ';" />';
-    }).join('');
-    return '<svg class="clock-arcs' + (compact ? ' is-small' : '') + '" viewBox="0 0 100 100" aria-hidden="true">' +
-      '<defs>' + defs + '</defs>' +
-      '<circle class="clock-track" cx="50" cy="50" r="' + radius + '" style="stroke-width:' + stroke + ';"></circle>' +
-      arcs +
-    '</svg>';
-  }
+      var baseColor = meta.color;
+      var lightColor = mixHex(baseColor, '#ffffff', 0.25);
 
-  function describeArc(radius, startMinutes, endMinutes) {
-    var start = polarToCartesian(radius, startMinutes);
-    var end = polarToCartesian(radius, endMinutes);
-    var largeArcFlag = endMinutes - startMinutes > 720 ? 1 : 0;
-    return [
-      'M', start.x, start.y,
-      'A', radius, radius, 0, largeArcFlag, 1, end.x, end.y
-    ].join(' ');
-  }
+      // Track gap before this event
+      if (startDeg > lastEndDeg + 0.5) {
+        stops.push(trackColor + ' ' + lastEndDeg.toFixed(1) + 'deg');
+        stops.push(trackColor + ' ' + startDeg.toFixed(1) + 'deg');
+      }
 
-  function polarToCartesian(radius, minute) {
-    var angle = (minute / 1440) * Math.PI * 2 - Math.PI / 2;
-    return {
-      x: (50 + radius * Math.cos(angle)).toFixed(3),
-      y: (50 + radius * Math.sin(angle)).toFixed(3)
-    };
-  }
+      // Activity segment with subtle inner gradient
+      stops.push(lightColor + ' ' + startDeg.toFixed(1) + 'deg');
+      stops.push(baseColor + ' ' + ((startDeg + endDeg) / 2).toFixed(1) + 'deg');
+      stops.push(lightColor + ' ' + endDeg.toFixed(1) + 'deg');
 
-  function getActivityGradient(meta) {
-    return {
-      from: mixHex(meta.color, '#ffffff', 0.34),
-      to: mixHex(meta.color, '#d8e0e6', 0.24)
-    };
-  }
+      lastEndDeg = endDeg;
+    });
 
-  function getClockGradientId(event, compact, index) {
-    return 'clock-grad-' + (compact ? 's' : 'l') + '-' + index + '-' + event.startMinutes + '-' + event.endMinutes;
+    // Fill remaining with track
+    if (lastEndDeg < 359.5) {
+      stops.push(trackColor + ' ' + lastEndDeg.toFixed(1) + 'deg');
+      stops.push(trackColor + ' 360deg');
+    }
+
+    return 'conic-gradient(from 0deg, ' + stops.join(', ') + ')';
   }
 
   function mixHex(base, target, ratio) {
