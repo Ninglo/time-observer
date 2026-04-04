@@ -1,4 +1,5 @@
 (function() {
+  var BUILD_VERSION = '2026.04.04d';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
@@ -74,8 +75,47 @@
   }
 
   function init() {
-    renderApp();
     bindGlobalEvents();
+    renderVersionFooter();
+    // Show loading state first, then sync, then render
+    var root = document.getElementById('main-content');
+    root.innerHTML =
+      '<div class="page-stack">' +
+        '<div class="card empty-card" style="text-align:center;padding:48px 24px;">' +
+          '<p class="empty-text">正在同步数据...</p>' +
+        '</div>' +
+      '</div>';
+    updateTopBar(uiState.currentDayKey);
+    autoSync(function() {
+      renderApp();
+    });
+  }
+
+  function renderVersionFooter() {
+    var footer = document.createElement('div');
+    footer.className = 'version-footer';
+    footer.id = 'version-footer';
+    footer.innerHTML = 'v' + BUILD_VERSION;
+    document.body.appendChild(footer);
+  }
+
+  function updateVersionFooter(text) {
+    var footer = document.getElementById('version-footer');
+    if (footer) footer.innerHTML = 'v' + BUILD_VERSION + ' · ' + text;
+  }
+
+  function autoSync(onDone) {
+    updateVersionFooter('同步中...');
+    Sync.fetchAndMerge(function(err) {
+      if (err) {
+        updateVersionFooter('离线模式');
+      } else {
+        var now = new Date();
+        var timeStr = Storage.pad(now.getHours()) + ':' + Storage.pad(now.getMinutes());
+        updateVersionFooter(timeStr + ' 已同步');
+      }
+      if (onDone) onDone();
+    });
   }
 
   function bindGlobalEvents() {
@@ -85,13 +125,9 @@
     });
     document.getElementById('btn-sync').addEventListener('click', function() {
       showToast('正在同步...');
-      Sync.fetchAndMerge(function(err) {
-        if (err) {
-          showToast('同步失败，请稍后重试');
-        } else {
-          showToast('同步成功');
-          renderApp();
-        }
+      autoSync(function() {
+        showToast('已同步');
+        renderApp();
       });
     });
     document.getElementById('btn-prev-day').addEventListener('click', function() {
