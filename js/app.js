@@ -1,5 +1,5 @@
 (function() {
-  var BUILD_VERSION = '2026.04.04g';
+  var BUILD_VERSION = '2026.04.04h';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
@@ -255,33 +255,27 @@
     var isToday = dayKey === Storage.getTodayKey();
     return '' +
       renderStatusCard(events, summary, review) +
-      renderQuickActions(isToday) +
-      renderQuickInput(dayKey) +
+      renderActionGrid(isToday) +
       renderRemindersSection(reminders) +
       renderTimeline(events, isToday) +
       renderJournalSection(journal) +
       renderReviewSection(review);
   }
 
-  function renderQuickInput(dayKey) {
-    return '' +
-      '<section class="quick-input-btns">' +
-        '<button class="btn-note is-journal" data-action="open-journal">写点什么</button>' +
-        '<button class="btn-note is-reminder" data-action="open-reminder">提醒一下</button>' +
-      '</section>';
-  }
-
-  function renderQuickActions(isToday) {
+  function renderActionGrid(isToday) {
     if (isToday) {
       return '' +
-        '<section class="quick-actions">' +
+        '<section class="action-grid">' +
           '<button class="btn btn-primary" data-action="open-add" data-mode="quick">记录此刻</button>' +
           '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
+          '<button class="btn btn-secondary" data-action="open-journal">写点什么</button>' +
+          '<button class="btn btn-secondary" data-action="open-reminder">提醒一下</button>' +
         '</section>';
     }
     return '' +
-      '<section class="quick-actions">' +
+      '<section class="action-grid">' +
         '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
+        '<button class="btn btn-secondary" data-action="open-journal">写点什么</button>' +
       '</section>';
   }
 
@@ -303,7 +297,6 @@
             wakeUpText +
           '</div>' +
         '</div>' +
-        renderActivitySummary(events) +
       '</section>';
   }
 
@@ -955,44 +948,38 @@
   }
 
   function buildConicGradient(events) {
-    var trackColor = '#f0ece6';
+    var trackColor = '#f7f4ef';
     if (!events.length) return trackColor;
 
     var sorted = events.slice().sort(function(a, b) {
       return a.startMinutes - b.startMinutes;
     });
 
-    var stops = [];
-    var lastEndDeg = 0;
-
+    var segments = [];
     sorted.forEach(function(event) {
       var startDeg = (event.startMinutes / 1440) * 360;
       var endDeg = (event.endMinutes / 1440) * 360;
       if (endDeg <= startDeg) return;
-
       var meta = getActivityMeta(event.activity);
-      var baseColor = meta.color;
-      var lightColor = mixHex(baseColor, '#ffffff', 0.35);
+      segments.push({ start: startDeg, end: endDeg, color: mixHex(meta.color, '#ffffff', 0.45) });
+    });
+    if (!segments.length) return trackColor;
 
-      // Track gap before this event
-      if (startDeg > lastEndDeg + 0.5) {
-        stops.push(trackColor + ' ' + lastEndDeg.toFixed(1) + 'deg');
-        stops.push(trackColor + ' ' + startDeg.toFixed(1) + 'deg');
-      }
+    var stops = [];
+    var fade = 3;
 
-      // Activity segment with subtle inner gradient
-      stops.push(lightColor + ' ' + startDeg.toFixed(1) + 'deg');
-      stops.push(baseColor + ' ' + ((startDeg + endDeg) / 2).toFixed(1) + 'deg');
-      stops.push(lightColor + ' ' + endDeg.toFixed(1) + 'deg');
+    stops.push(trackColor + ' 0deg');
 
-      lastEndDeg = endDeg;
+    segments.forEach(function(seg) {
+      // Fade from track to segment over ~fade degrees
+      stops.push(trackColor + ' ' + Math.max(0, seg.start - fade).toFixed(1) + 'deg');
+      stops.push(seg.color + ' ' + seg.start.toFixed(1) + 'deg');
+      stops.push(seg.color + ' ' + seg.end.toFixed(1) + 'deg');
+      // Fade from segment back to track
+      stops.push(trackColor + ' ' + Math.min(360, seg.end + fade).toFixed(1) + 'deg');
     });
 
-    // Fill remaining with track
-    if (lastEndDeg < 359.5) {
-      stops.push(trackColor + ' ' + lastEndDeg.toFixed(1) + 'deg');
-      stops.push(trackColor + ' 360deg');
-    }
+    stops.push(trackColor + ' 360deg');
 
     return 'conic-gradient(from 0deg, ' + stops.join(', ') + ')';
   }

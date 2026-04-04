@@ -260,34 +260,35 @@ button {
   gap: var(--space-2);
 }
 
-.quick-actions {
-  display: flex;
-  gap: var(--space-3);
-  padding: 0 4px;
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
-.quick-actions .btn {
-  flex: 1;
-  padding: 16px 0;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 16px;
-  letter-spacing: 0.5px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+.action-grid .btn {
+  min-height: 0;
+  padding: 14px 0;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 14px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.quick-actions .btn:active {
+.action-grid .btn:active {
   transform: scale(0.97);
 }
 
-.quick-actions .btn-primary {
-  background: linear-gradient(135deg, #a8c586 0%, #7ba862 50%, #6a9e52 100%);
-  box-shadow: 0 4px 16px rgba(123, 168, 98, 0.28), 0 1px 3px rgba(123, 168, 98, 0.12);
+.action-grid .btn-primary {
+  background: linear-gradient(135deg, #a8c586, #7ba862);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(123, 168, 98, 0.22);
 }
 
-.quick-actions .btn-secondary {
+.action-grid .btn-secondary {
   background: rgba(255, 254, 249, 0.94);
-  border: 1.5px solid rgba(200, 194, 182, 0.6);
+  border: 1px solid rgba(200, 194, 182, 0.5);
+  color: var(--gray-800);
   box-shadow: var(--shadow);
 }
 
@@ -377,7 +378,7 @@ button {
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
-  background: #f0ece6;
+  background: #f7f4ef;
   box-shadow:
     0 0 0 1px rgba(221, 217, 208, 0.35),
     0 2px 8px rgba(120, 100, 80, 0.08),
@@ -688,46 +689,10 @@ button {
   background: rgba(225, 236, 212, 0.95);
 }
 
-/* --- Note buttons (write / remind) --- */
-.quick-input-btns {
-  display: flex;
-  gap: 10px;
-  padding: 0 4px;
-}
-
-.btn-note {
-  flex: 1;
-  padding: 12px 0;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.12s ease;
-  text-align: center;
-}
-
-.btn-note:active {
-  transform: scale(0.97);
-}
-
-.btn-note.is-journal {
-  background: rgba(238, 248, 242, 0.95);
-  color: #5a9a62;
-  border: 1px solid rgba(142, 205, 160, 0.35);
-}
-
-.btn-note.is-reminder {
-  background: rgba(255, 250, 238, 0.95);
-  color: #a08030;
-  border: 1px solid rgba(218, 198, 148, 0.35);
-}
 
 /* --- Status card (today summary) --- */
 .status-card {
   padding: 18px;
-  background: linear-gradient(160deg, rgba(255, 254, 249, 0.92) 0%, rgba(248, 246, 238, 0.90) 100%);
-  box-shadow: var(--shadow-md);
 }
 
 .status-card-inner {
@@ -770,9 +735,8 @@ button {
 /* --- Reminder card --- */
 .reminder-card {
   padding: 20px;
-  background: linear-gradient(160deg, rgba(255, 250, 235, 0.92) 0%, rgba(255, 247, 225, 0.85) 100%);
-  border-color: rgba(218, 198, 148, 0.4);
-  box-shadow: 0 1px 3px rgba(180, 155, 90, 0.06), 0 4px 16px rgba(180, 155, 90, 0.08);
+  padding-left: 22px;
+  border-left: 3px solid #e8c498;
 }
 
 .reminder-list {
@@ -816,9 +780,7 @@ button {
 .journal-card {
   padding: 20px;
   padding-left: 22px;
-  background: rgba(255, 254, 249, 0.88);
-  border-left: 3px solid rgba(168, 197, 134, 0.5);
-  position: relative;
+  border-left: 3px solid #8ecda0;
 }
 
 .journal-list {
@@ -845,9 +807,8 @@ button {
 /* --- Review card --- */
 .review-card {
   padding: 20px;
-  background: linear-gradient(160deg, rgba(240, 246, 252, 0.88) 0%, rgba(232, 240, 250, 0.82) 100%);
-  border-color: rgba(180, 205, 230, 0.4);
-  box-shadow: 0 1px 3px rgba(100, 140, 180, 0.05), 0 4px 16px rgba(100, 140, 180, 0.07);
+  padding-left: 22px;
+  border-left: 3px solid #8abde0;
 }
 
 .review-body {
