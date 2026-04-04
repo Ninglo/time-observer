@@ -1,5 +1,5 @@
 (function() {
-  var BUILD_VERSION = '2026.04.04d';
+  var BUILD_VERSION = '2026.04.04e';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
@@ -146,6 +146,22 @@
     });
 
     document.body.addEventListener('click', function(event) {
+      // Quick input buttons
+      if (event.target.id === 'btn-add-journal' || event.target.id === 'btn-add-reminder') {
+        var input = document.getElementById('quick-input');
+        var text = input ? input.value.trim() : '';
+        if (!text) { showToast('先写点什么'); return; }
+        if (event.target.id === 'btn-add-journal') {
+          Storage.createJournal({ dayKey: uiState.currentDayKey, text: text });
+          showToast('随想已记下');
+        } else {
+          Storage.createReminder({ dayKey: uiState.currentDayKey, text: text });
+          showToast('提醒已添加');
+        }
+        renderApp();
+        return;
+      }
+
       var target = event.target.closest('[data-action]');
       if (!target) return;
       var action = target.getAttribute('data-action');
@@ -227,10 +243,24 @@
     return '' +
       renderStatusCard(events, summary, review) +
       renderQuickActions(isToday) +
+      renderQuickInput(dayKey) +
       renderRemindersSection(reminders) +
       renderTimeline(events, isToday) +
       renderJournalSection(journal) +
       renderReviewSection(review);
+  }
+
+  function renderQuickInput(dayKey) {
+    return '' +
+      '<section class="card quick-input-card">' +
+        '<div class="quick-input-row">' +
+          '<input class="quick-input-text" id="quick-input" type="text" maxlength="100" placeholder="写一句随想，或加一条提醒...">' +
+          '<div class="quick-input-actions">' +
+            '<button class="quick-input-btn is-journal" id="btn-add-journal" title="记为随想">记</button>' +
+            '<button class="quick-input-btn is-reminder" id="btn-add-reminder" title="加为提醒">提醒</button>' +
+          '</div>' +
+        '</div>' +
+      '</section>';
   }
 
   function renderQuickActions(isToday) {
