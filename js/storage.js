@@ -1,7 +1,21 @@
 var Storage = (function() {
   var STORAGE_KEY = 'quiet_life_records_v3';
   var LEGACY_STORAGE_KEY = 'quiet_life_records_v2';
-  var DEFAULT_TAG_COLORS = ['#7F9A65', '#B46D5B', '#C69138', '#4F7B78', '#856B9D', '#4E6FAE'];
+  var DEFAULT_TAG_COLORS = ['#9CCBFF', '#F6C2D9', '#F6E27A', '#AEE8D8', '#C9BCFF', '#BDE87B'];
+  var LEGACY_TAG_COLOR_MAP = {
+    '#607E54': '#AEE8D8',
+    '#4D6F9A': '#9CCBFF',
+    '#8A6A9E': '#C9BCFF',
+    '#B46A51': '#F6C2D9',
+    '#B9893E': '#F6E27A',
+    '#567A7A': '#AEE8D8',
+    '#7F9A65': '#BDE87B',
+    '#B46D5B': '#F6C2D9',
+    '#C69138': '#F6E27A',
+    '#4F7B78': '#AEE8D8',
+    '#856B9D': '#C9BCFF',
+    '#4E6FAE': '#9CCBFF'
+  };
 
   function getDefaultState() {
     return {
@@ -648,12 +662,13 @@ var Storage = (function() {
 
   function normalizeHex(color) {
     var value = String(color || '').trim();
-    if (!value) return '#7F9A65';
+    if (!value) return '#9CCBFF';
     if (value.charAt(0) !== '#') value = '#' + value;
     if (value.length === 4) {
       value = '#' + value.charAt(1) + value.charAt(1) + value.charAt(2) + value.charAt(2) + value.charAt(3) + value.charAt(3);
     }
-    return value.length === 7 ? value.toUpperCase() : '#7F9A65';
+    value = value.length === 7 ? value.toUpperCase() : '#9CCBFF';
+    return LEGACY_TAG_COLOR_MAP[value] || value;
   }
 
   function mealSortWeight(type) {

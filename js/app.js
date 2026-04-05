@@ -50,12 +50,12 @@
 
   var DURATION_OPTIONS = [15, 30, 45, 60, 90, 120, 150, 180];
   var TAG_COLOR_OPTIONS = [
-    { value: '#607E54', label: '苔绿' },
-    { value: '#4D6F9A', label: '远山蓝' },
-    { value: '#8A6A9E', label: '雾紫' },
-    { value: '#B46A51', label: '陶土' },
-    { value: '#B9893E', label: '麦金' },
-    { value: '#567A7A', label: '松烟青' }
+    { value: '#9CCBFF', label: '天蓝' },
+    { value: '#F6C2D9', label: '樱粉' },
+    { value: '#F6E27A', label: '奶黄' },
+    { value: '#AEE8D8', label: '薄荷' },
+    { value: '#C9BCFF', label: '雾紫' },
+    { value: '#BDE87B', label: '青柠' }
   ];
 
   var MEAL_TYPE_META = {
