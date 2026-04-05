@@ -391,70 +391,75 @@
   }
 
   function renderReminderCard(reminders) {
+    if (!reminders.length) {
+      return renderCompactNoteCard('提醒', '暂无');
+    }
     var html =
       '<section class="surface-card note-card">' +
         '<h3 class="section-title">提醒</h3>';
-    if (!reminders.length) {
-      html += '<p class="empty-text">暂无</p>';
-    } else {
-      html += '<div class="reminder-list">';
-      reminders.forEach(function(item) {
-        html +=
-          '<div class="reminder-item' + (item.done ? ' is-done' : '') + '" data-action="toggle-reminder" data-id="' + escapeHtml(item.id) + '" data-done="' + (item.done ? 'true' : 'false') + '">' +
-            '<span class="reminder-check">' + (item.done ? '☑' : '☐') + '</span>' +
-            '<span class="reminder-text-line">' + escapeHtml(item.text) + '</span>' +
-          '</div>';
-      });
-      html += '</div>';
-    }
+    html += '<div class="reminder-list">';
+    reminders.forEach(function(item) {
+      html +=
+        '<div class="reminder-item' + (item.done ? ' is-done' : '') + '" data-action="toggle-reminder" data-id="' + escapeHtml(item.id) + '" data-done="' + (item.done ? 'true' : 'false') + '">' +
+          '<span class="reminder-check">' + (item.done ? '☑' : '☐') + '</span>' +
+          '<span class="reminder-text-line">' + escapeHtml(item.text) + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
     html += '</section>';
     return html;
   }
 
   function renderJournalCard(journal) {
+    if (!journal.length) {
+      return renderCompactNoteCard('随想', '暂无');
+    }
     var html =
       '<section class="surface-card note-card">' +
         '<h3 class="section-title">随想</h3>';
-
-    if (!journal.length) {
-      html += '<p class="empty-text">暂无</p>';
-    } else {
-      html += '<div class="journal-list">';
-      journal.forEach(function(item) {
-        html +=
-          '<div class="journal-item">' +
-            '<span class="journal-quote">“</span>' +
-            '<span class="journal-text">' + escapeHtml(item.text) + '</span>' +
-            '<span class="journal-quote">”</span>' +
-          '</div>';
-      });
-      html += '</div>';
-    }
+    html += '<div class="journal-list">';
+    journal.forEach(function(item) {
+      html +=
+        '<div class="journal-item">' +
+          '<span class="journal-quote">“</span>' +
+          '<span class="journal-text">' + escapeHtml(item.text) + '</span>' +
+          '<span class="journal-quote">”</span>' +
+        '</div>';
+    });
+    html += '</div>';
 
     html += '</section>';
     return html;
   }
 
   function renderReviewCard(review) {
+    if (!review) {
+      return renderCompactNoteCard('复盘', '暂无');
+    }
     var html =
       '<section class="surface-card note-card">' +
         '<h3 class="section-title">复盘</h3>';
-
-    if (!review) {
-      html += '<p class="empty-text">暂无</p>';
-    } else {
-      if (review.summary) html += '<p class="review-text">' + escapeHtml(review.summary) + '</p>';
-      if (review.highlights) html += '<p class="review-highlight">' + escapeHtml(review.highlights) + '</p>';
-    }
+    if (review.summary) html += '<p class="review-text">' + escapeHtml(review.summary) + '</p>';
+    if (review.highlights) html += '<p class="review-highlight">' + escapeHtml(review.highlights) + '</p>';
 
     html += '</section>';
     return html;
   }
 
+  function renderCompactNoteCard(title, value) {
+    return '' +
+      '<section class="surface-card note-card note-card-compact">' +
+        '<div class="compact-note-row">' +
+          '<h3 class="section-title">' + escapeHtml(title) + '</h3>' +
+          '<span class="compact-note-value">' + escapeHtml(value) + '</span>' +
+        '</div>' +
+      '</section>';
+  }
+
   function renderFoodView(meals, mealSummary) {
     return '' +
       '<section class="surface-card food-hero-card">' +
-        '<h2 class="hero-title">今天饮食</h2>' +
+        '<h2 class="section-title">今天饮食</h2>' +
         '<div class="metric-grid food-metric-grid">' +
           renderMetricCard('已记录', mealSummary.count ? mealSummary.count + ' 餐' : '0 餐', 'sage') +
           renderMetricCard('热量', mealSummary.count ? Math.round(mealSummary.calories) + ' kcal' : '待整理', 'sand') +
@@ -522,14 +527,14 @@
   function renderWeekView(weekAggregate) {
     return '' +
       '<section class="surface-card week-hero-card">' +
-        '<h2 class="hero-title">本周</h2>' +
+        '<h2 class="section-title">本周</h2>' +
         '<div class="metric-grid">' +
           renderMetricCard('总时长', formatDuration(weekAggregate.totalMinutes), 'sage') +
           renderMetricCard('总段数', weekAggregate.totalEvents ? weekAggregate.totalEvents + ' 段' : '0 段', 'mist') +
           renderMetricCard('有记录天数', weekAggregate.activeDays ? weekAggregate.activeDays + ' 天' : '0 天', 'sand') +
         '</div>' +
       '</section>' +
-      renderWeekBreakdown(weekAggregate.categories, weekAggregate.totalMinutes) +
+      (weekAggregate.categories.length ? renderWeekBreakdown(weekAggregate.categories, weekAggregate.totalMinutes) : '') +
       renderWeekGrid(weekAggregate.weekDays);
   }
 
@@ -538,26 +543,22 @@
       '<section class="surface-card week-breakdown-card">' +
         '<h3 class="section-title">投入分布</h3>';
 
-    if (!categories.length) {
-      html += '<p class="empty-text">暂无</p>';
-    } else {
-      html += '<div class="week-breakdown-list">';
-      categories.forEach(function(item) {
-        var meta = getActivityMeta(item.activity);
-        var ratio = totalMinutes ? (item.minutes / totalMinutes) * 100 : 0;
-        html +=
-          '<div class="week-breakdown-item">' +
-            '<div class="week-breakdown-top">' +
-              '<span class="week-breakdown-label">' + escapeHtml(meta.label) + '</span>' +
-              '<span class="week-breakdown-value">' + escapeHtml(formatDuration(item.minutes)) + '</span>' +
-            '</div>' +
-            '<div class="week-breakdown-bar">' +
-              '<span class="week-breakdown-fill" style="width:' + ratio.toFixed(1) + '%; background:linear-gradient(90deg, ' + meta.color + ', ' + mixHex(meta.color, '#ffffff', 0.15) + ');"></span>' +
-            '</div>' +
-          '</div>';
-      });
-      html += '</div>';
-    }
+    html += '<div class="week-breakdown-list">';
+    categories.forEach(function(item) {
+      var meta = getActivityMeta(item.activity);
+      var ratio = totalMinutes ? (item.minutes / totalMinutes) * 100 : 0;
+      html +=
+        '<div class="week-breakdown-item">' +
+          '<div class="week-breakdown-top">' +
+            '<span class="week-breakdown-label">' + escapeHtml(meta.label) + '</span>' +
+            '<span class="week-breakdown-value">' + escapeHtml(formatDuration(item.minutes)) + '</span>' +
+          '</div>' +
+          '<div class="week-breakdown-bar">' +
+            '<span class="week-breakdown-fill" style="width:' + ratio.toFixed(1) + '%; background:linear-gradient(90deg, ' + meta.color + ', ' + mixHex(meta.color, '#ffffff', 0.15) + ');"></span>' +
+          '</div>' +
+        '</div>';
+    });
+    html += '</div>';
 
     html += '</section>';
     return html;

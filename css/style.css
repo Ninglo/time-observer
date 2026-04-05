@@ -593,6 +593,23 @@ button {
   background: rgba(255, 251, 245, 0.82);
 }
 
+.note-card.note-card-compact {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.compact-note-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.compact-note-value {
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
 .journal-item {
   display: flex;
   gap: 2px;
@@ -951,18 +968,7 @@ button {
 }
 
 .version-footer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 20;
-  padding: 6px 16px calc(6px + env(safe-area-inset-bottom, 0px));
-  text-align: center;
-  font-size: 11px;
-  color: var(--text-faint);
-  background: rgba(247, 242, 234, 0.7);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(128, 113, 93, 0.1);
+  display: none;
 }
 
 @media (hover: hover) {
@@ -1127,6 +1133,23 @@ button {
   .food-hero-card .hero-title,
   .week-hero-card .hero-title {
     font-size: 26px;
+  }
+
+  .note-card.note-card-compact {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .compact-note-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .compact-note-value {
+    font-size: 13px;
+    color: var(--text-faint);
   }
 
   .week-card {
