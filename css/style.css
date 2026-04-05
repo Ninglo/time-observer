@@ -279,12 +279,6 @@ button {
   transform: scale(0.97);
 }
 
-.action-grid .btn-primary {
-  background: linear-gradient(135deg, #a8c586, #7ba862);
-  color: #fff;
-  box-shadow: 0 2px 10px rgba(123, 168, 98, 0.22);
-}
-
 .action-grid .btn-secondary {
   background: rgba(255, 254, 249, 0.94);
   border: 1px solid rgba(200, 194, 182, 0.5);

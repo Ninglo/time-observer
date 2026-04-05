@@ -1,5 +1,5 @@
 (function() {
-  var BUILD_VERSION = '2026.04.04h';
+  var BUILD_VERSION = '2026.04.04i';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
@@ -266,7 +266,7 @@
     if (isToday) {
       return '' +
         '<section class="action-grid">' +
-          '<button class="btn btn-primary" data-action="open-add" data-mode="quick">记录此刻</button>' +
+          '<button class="btn btn-secondary" data-action="open-add" data-mode="quick">记录此刻</button>' +
           '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
           '<button class="btn btn-secondary" data-action="open-journal">写点什么</button>' +
           '<button class="btn btn-secondary" data-action="open-reminder">提醒一下</button>' +
@@ -961,12 +961,12 @@
       var endDeg = (event.endMinutes / 1440) * 360;
       if (endDeg <= startDeg) return;
       var meta = getActivityMeta(event.activity);
-      segments.push({ start: startDeg, end: endDeg, color: mixHex(meta.color, '#ffffff', 0.45) });
+      segments.push({ start: startDeg, end: endDeg, color: mixHex(meta.color, '#ffffff', 0.6) });
     });
     if (!segments.length) return trackColor;
 
     var stops = [];
-    var fade = 3;
+    var fade = 10;
 
     stops.push(trackColor + ' 0deg');
 
