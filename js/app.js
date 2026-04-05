@@ -1,5 +1,5 @@
 (function() {
-  var BUILD_VERSION = '2026.04.04i';
+  var BUILD_VERSION = '2026.04.05a';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
