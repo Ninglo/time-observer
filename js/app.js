@@ -72,6 +72,7 @@
 
   var addFormState = getDefaultAddState();
   var pendingConflictPayload = null;
+  var backgroundSyncTimer = null;
 
   function getDefaultAddState() {
     return {
@@ -95,6 +96,7 @@
 
   function init() {
     bindGlobalEvents();
+    bindBackgroundSyncEvents();
     renderVersionFooter();
 
     var root = document.getElementById('main-content');
@@ -106,6 +108,7 @@
       '</div>';
     updateTopBar(uiState.currentDayKey);
     autoSync(function() {
+      startBackgroundSync();
       renderApp();
     });
   }
@@ -220,6 +223,31 @@
     });
   }
 
+  function bindBackgroundSyncEvents() {
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) syncAndRenderIfIdle();
+    });
+    window.addEventListener('focus', function() {
+      syncAndRenderIfIdle();
+    });
+  }
+
+  function startBackgroundSync() {
+    if (backgroundSyncTimer) clearInterval(backgroundSyncTimer);
+    backgroundSyncTimer = setInterval(function() {
+      syncAndRenderIfIdle();
+    }, 20000);
+  }
+
+  function syncAndRenderIfIdle() {
+    if (document.hidden) return;
+    autoSync(function() {
+      if (!document.getElementById('modal-overlay').classList.contains('show')) {
+        renderApp();
+      }
+    });
+  }
+
   function submitNote(noteType) {
     var textarea = document.getElementById('note-textarea');
     var text = textarea ? textarea.value.trim() : '';
@@ -247,6 +275,7 @@
   }
 
   function renderApp() {
+    Storage.syncMealsFromJournal();
     var root = document.getElementById('main-content');
     var dayKey = uiState.currentDayKey;
     var events = Storage.getEventsByDay(dayKey);

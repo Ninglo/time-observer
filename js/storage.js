@@ -41,7 +41,7 @@ var Storage = (function() {
     var tagMap = buildTagMap(tags);
 
     state.outings = Array.isArray(parsed && parsed.outings) ? parsed.outings : [];
-    state.journal = Array.isArray(parsed && parsed.journal) ? parsed.journal : [];
+    state.journal = Array.isArray(parsed && parsed.journal) ? parsed.journal.map(normalizeJournalEntry).filter(Boolean) : [];
     state.reminders = Array.isArray(parsed && parsed.reminders) ? parsed.reminders : [];
     state.reviews = Array.isArray(parsed && parsed.reviews) ? parsed.reviews : [];
     state.meals = Array.isArray(parsed && parsed.meals) ? parsed.meals.map(normalizeMeal).filter(Boolean) : [];
@@ -177,6 +177,21 @@ var Storage = (function() {
       calories: Number(raw.calories) || items.reduce(function(sum, item) { return sum + (Number(item.calories) || 0); }, 0),
       protein: Number(raw.protein) || items.reduce(function(sum, item) { return sum + (Number(item.protein) || 0); }, 0),
       note: String(raw.note || '').trim(),
+      createdAt: raw.createdAt || new Date().toISOString(),
+      updatedAt: raw.updatedAt || new Date().toISOString()
+    };
+  }
+
+  function normalizeJournalEntry(raw) {
+    if (!raw) return null;
+    return {
+      id: raw.id || generateId(),
+      dayKey: raw.dayKey || getTodayKey(),
+      text: String(raw.text || '').trim(),
+      mood: raw.mood || '',
+      tags: Array.isArray(raw.tags)
+        ? raw.tags.map(function(item) { return String(item || '').trim(); }).filter(Boolean)
+        : [],
       createdAt: raw.createdAt || new Date().toISOString(),
       updatedAt: raw.updatedAt || new Date().toISOString()
     };
@@ -445,9 +460,35 @@ var Storage = (function() {
     var state = readState();
     var meal = normalizeMeal(data);
     if (!meal) return null;
-    state.meals.push(meal);
+    var existingIndex = state.meals.findIndex(function(item) { return item.id === meal.id; });
+    if (existingIndex >= 0) {
+      state.meals[existingIndex] = meal;
+    } else {
+      state.meals.push(meal);
+    }
     saveState(state);
     return meal;
+  }
+
+  function syncMealsFromJournal() {
+    var state = readState();
+    var existingIds = {};
+    state.meals.forEach(function(item) {
+      existingIds[item.id] = true;
+    });
+
+    var changed = false;
+    state.journal.forEach(function(entry) {
+      var parsed = parseMealFromJournalEntry(entry);
+      if (!parsed) return;
+      if (existingIds[parsed.id]) return;
+      state.meals.push(parsed);
+      existingIds[parsed.id] = true;
+      changed = true;
+    });
+
+    if (changed) saveState(state);
+    return changed;
   }
 
   function getRecentOuting() {
@@ -501,14 +542,15 @@ var Storage = (function() {
 
   function createJournal(data) {
     var state = readState();
-    var entry = {
+    var entry = normalizeJournalEntry({
       id: data.id || generateId(),
       dayKey: data.dayKey || getTodayKey(),
       text: data.text || '',
       mood: data.mood || '',
+      tags: data.tags || [],
       createdAt: data.createdAt || new Date().toISOString(),
       updatedAt: data.updatedAt || new Date().toISOString()
-    };
+    });
     state.journal.push(entry);
     saveState(state);
     return entry;
@@ -623,6 +665,59 @@ var Storage = (function() {
     }[type] || 9;
   }
 
+  function parseMealFromJournalEntry(entry) {
+    if (!entry || !entry.text) return null;
+    var text = String(entry.text || '').trim();
+    var lower = text.toLowerCase();
+    var tags = Array.isArray(entry.tags) ? entry.tags.map(function(item) { return String(item || '').toLowerCase(); }) : [];
+    var mealType = detectMealType(text);
+    var likelyMeal = mealType !== 'snack' || /早餐|午餐|晚餐|加餐|夜宵|热量|蛋白质|kcal|卡路里/i.test(text) || tags.indexOf('diet') >= 0 || tags.indexOf('meal') >= 0;
+    if (!likelyMeal) return null;
+
+    var summaryPart = text.split('|')[0];
+    summaryPart = summaryPart.replace(/^(早餐|午餐|晚餐|加餐|夜宵)\s*[:：]?\s*/i, '').trim();
+    if (!summaryPart) summaryPart = text;
+
+    var caloriesMatch = text.match(/(?:热量|卡路里)[^\d]{0,6}(\d+(?:\.\d+)?)/i) || text.match(/(\d+(?:\.\d+)?)\s*kcal/i);
+    var proteinMatch = text.match(/蛋白质[^\d]{0,6}(\d+(?:\.\d+)?)/i) || text.match(/(\d+(?:\.\d+)?)\s*g/i);
+    var calories = caloriesMatch ? Number(caloriesMatch[1]) : 0;
+    var protein = proteinMatch ? Number(proteinMatch[1]) : 0;
+
+    var items = summaryPart.split(/[+＋、,，/]/).map(function(part) {
+      var cleaned = String(part || '').trim();
+      if (!cleaned) return null;
+      return {
+        name: cleaned,
+        amount: '',
+        calories: 0,
+        protein: 0
+      };
+    }).filter(Boolean);
+
+    return normalizeMeal({
+      id: 'meal_from_journal_' + entry.id,
+      dayKey: entry.dayKey,
+      mealType: mealType,
+      summary: summaryPart,
+      source: 'ai-journal',
+      confidence: 'AI 整理',
+      calories: calories,
+      protein: protein,
+      items: items,
+      note: text,
+      createdAt: entry.createdAt,
+      updatedAt: entry.updatedAt
+    });
+  }
+
+  function detectMealType(text) {
+    if (/早餐/i.test(text)) return 'breakfast';
+    if (/午餐/i.test(text)) return 'lunch';
+    if (/晚餐|夜宵/i.test(text)) return 'dinner';
+    if (/加餐/i.test(text)) return 'snack';
+    return 'snack';
+  }
+
   return {
     getTodayKey: getTodayKey,
     getDayKey: getDayKey,
@@ -650,6 +745,7 @@ var Storage = (function() {
     getMealsByDay: getMealsByDay,
     getMealSummaryByDay: getMealSummaryByDay,
     createMeal: createMeal,
+    syncMealsFromJournal: syncMealsFromJournal,
     pad: pad,
     roundToFive: roundToFive
   };
