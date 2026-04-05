@@ -1,52 +1,69 @@
 (function() {
-  var BUILD_VERSION = '2026.04.05a';
+  var BUILD_VERSION = '2026.04.05b';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
+
   var ACTIVITY_OPTIONS = [
     { value: 'study', label: '学习', icon: '读' },
-    { value: 'coding', label: 'coding', icon: '码' },
+    { value: 'coding', label: '编码', icon: '码' },
     { value: 'work', label: '工作', icon: '工' },
     { value: 'exercise', label: '运动', icon: '动' },
     { value: 'social', label: '社交', icon: '聊' },
     { value: 'cook', label: '做饭', icon: '煮' },
     { value: 'rest', label: '休息', icon: '歇' },
-    { value: 'nothing', label: '摆烂', icon: '躺' }
+    { value: 'nothing', label: '放空', icon: '云' }
   ];
+
   var ACTIVITY_PALETTES = {
-    study: { color: '#8ecda0', soft: '#eef8f2' },
-    coding: { color: '#8abde0', soft: '#ecf4fb' },
-    work: { color: '#b8a8e0', soft: '#f2eff9' },
-    exercise: { color: '#f0a898', soft: '#fdf0ec' },
-    social: { color: '#eca8bc', soft: '#fdeef4' },
-    cook: { color: '#e8c498', soft: '#faf3ea' },
-    rest: { color: '#a0bce0', soft: '#edf3fb' },
-    nothing: { color: '#ccc4ba', soft: '#f4f1ed' }
+    study: { color: '#607E54', soft: '#EEF3E5' },
+    coding: { color: '#4D6F9A', soft: '#EAF0F8' },
+    work: { color: '#8A6A9E', soft: '#F2ECF8' },
+    exercise: { color: '#B46A51', soft: '#F9EDE8' },
+    social: { color: '#B06A77', soft: '#F8EBEF' },
+    cook: { color: '#B9893E', soft: '#FBF1E1' },
+    rest: { color: '#567A7A', soft: '#E8F2F1' },
+    nothing: { color: '#7A746B', soft: '#F1EEEA' }
   };
 
   var STATUS_OPTIONS = {
     energy: [
-      { value: '亮', label: '亮', note: '精神提着', soft: '#e8f7da', text: '#5b8d36' },
-      { value: '稳', label: '稳', note: '正常平稳', soft: '#e7f2f7', text: '#4b7589' },
-      { value: '乏', label: '乏', note: '有点没电', soft: '#f1ede6', text: '#857463' },
-      { value: '散', label: '散', note: '注意力飘', soft: '#eceffd', text: '#6d78b1' },
-      { value: '焦', label: '焦', note: '心里发紧', soft: '#faece9', text: '#a46863' }
+      { value: '亮', label: '亮', note: '精神提着', soft: '#EEF6DF', text: '#668A3E' },
+      { value: '稳', label: '稳', note: '正常平稳', soft: '#E8F1F8', text: '#496B86' },
+      { value: '乏', label: '乏', note: '有点没电', soft: '#F1ECE4', text: '#7D6B57' },
+      { value: '散', label: '散', note: '注意力飘', soft: '#ECEEFA', text: '#6771A0' },
+      { value: '焦', label: '焦', note: '心里发紧', soft: '#FAECE9', text: '#A2625A' }
     ],
     mood: [
-      { value: '松', label: '松', note: '松一点', soft: '#eaf7ee', text: '#5e8e70' },
-      { value: '晴', label: '晴', note: '顺着走', soft: '#fff4d8', text: '#a07d22' },
-      { value: '闷', label: '闷', note: '有点堵', soft: '#f0ebf8', text: '#756291' },
-      { value: '躁', label: '躁', note: '坐不住', soft: '#fbe8e7', text: '#ad5a56' },
-      { value: '空', label: '空', note: '没什么感觉', soft: '#f3f1ed', text: '#7c776f' }
+      { value: '松', label: '松', note: '松一点', soft: '#EAF6EF', text: '#5C876B' },
+      { value: '晴', label: '晴', note: '顺着走', soft: '#FFF4D9', text: '#A07A23' },
+      { value: '闷', label: '闷', note: '有点堵', soft: '#F0EAF8', text: '#735F94' },
+      { value: '躁', label: '躁', note: '坐不住', soft: '#FBE9E7', text: '#A75854' },
+      { value: '空', label: '空', note: '没什么感觉', soft: '#F2EFEB', text: '#78726A' }
     ],
     body: [
-      { value: '轻', label: '轻', note: '状态轻快', soft: '#e5f7f0', text: '#4f8d79' },
-      { value: '紧', label: '紧', note: '肩颈发紧', soft: '#f8eee3', text: '#9a7045' },
-      { value: '累', label: '累', note: '身体发沉', soft: '#ece7df', text: '#7a6b58' },
-      { value: '胀', label: '胀', note: '有点不舒服', soft: '#fff0e2', text: '#b07333' },
-      { value: '痛', label: '痛', note: '明确不适', soft: '#fde9ea', text: '#b95a68' }
+      { value: '轻', label: '轻', note: '状态轻快', soft: '#E7F5F0', text: '#4E8774' },
+      { value: '紧', label: '紧', note: '肩颈发紧', soft: '#F7EDE1', text: '#9A6F44' },
+      { value: '累', label: '累', note: '身体发沉', soft: '#ECE6DE', text: '#786958' },
+      { value: '胀', label: '胀', note: '有点不舒服', soft: '#FFF0E2', text: '#B07231' },
+      { value: '痛', label: '痛', note: '明确不适', soft: '#FCE8EA', text: '#B55B68' }
     ]
   };
 
   var DURATION_OPTIONS = [15, 30, 45, 60, 90, 120, 150, 180];
+  var TAG_COLOR_OPTIONS = [
+    { value: '#607E54', label: '苔绿' },
+    { value: '#4D6F9A', label: '远山蓝' },
+    { value: '#8A6A9E', label: '雾紫' },
+    { value: '#B46A51', label: '陶土' },
+    { value: '#B9893E', label: '麦金' },
+    { value: '#567A7A', label: '松烟青' }
+  ];
+
+  var MEAL_TYPE_META = {
+    breakfast: { label: '早餐', accent: '#D5A95E', soft: '#FBF2E4' },
+    lunch: { label: '午餐', accent: '#6D9560', soft: '#EEF5E8' },
+    dinner: { label: '晚餐', accent: '#7B6AA6', soft: '#F2EEFA' },
+    snack: { label: '加餐', accent: '#B56F63', soft: '#F9ECE8' }
+  };
 
   var uiState = {
     activeView: 'today',
@@ -64,29 +81,26 @@
       dayKey: Storage.getTodayKey(),
       startTime: '09:00',
       endTime: '10:00',
-      tags: '',
       customActivity: '',
       energy: '',
       mood: '',
       body: '',
       note: '',
-      noteOpen: false
+      noteOpen: false,
+      selectedTagIds: [],
+      newTagText: '',
+      newTagColor: TAG_COLOR_OPTIONS[0].value
     };
   }
 
   function init() {
-    // One-time: clear stale E2E test data from localStorage
-    if (!localStorage.getItem('_cleared_test_data_v1')) {
-      localStorage.removeItem('quiet_life_records_v2');
-      localStorage.setItem('_cleared_test_data_v1', '1');
-    }
     bindGlobalEvents();
     renderVersionFooter();
-    // Show loading state first, then sync, then render
+
     var root = document.getElementById('main-content');
     root.innerHTML =
       '<div class="page-stack">' +
-        '<div class="card empty-card" style="text-align:center;padding:48px 24px;">' +
+        '<div class="surface-card loading-card">' +
           '<p class="empty-text">正在同步数据...</p>' +
         '</div>' +
       '</div>';
@@ -116,8 +130,7 @@
         updateVersionFooter('离线模式');
       } else {
         var now = new Date();
-        var timeStr = Storage.pad(now.getHours()) + ':' + Storage.pad(now.getMinutes());
-        updateVersionFooter(timeStr + ' 已同步');
+        updateVersionFooter(Storage.pad(now.getHours()) + ':' + Storage.pad(now.getMinutes()) + ' 已同步');
       }
       if (onDone) onDone();
     });
@@ -128,23 +141,28 @@
       Storage.exportData();
       showToast('已经导出本地数据');
     });
+
     document.getElementById('btn-sync').addEventListener('click', function() {
       showToast('正在同步...');
       autoSync(function() {
-        showToast('已同步');
         renderApp();
+        showToast('已同步');
       });
     });
+
     document.getElementById('btn-prev-day').addEventListener('click', function() {
       navigateDay(-1);
     });
+
     document.getElementById('btn-next-day').addEventListener('click', function() {
       navigateDay(1);
     });
+
     document.getElementById('btn-today').addEventListener('click', function() {
       uiState.currentDayKey = Storage.getTodayKey();
       renderApp();
     });
+
     document.getElementById('modal-close').addEventListener('click', closeModal);
     document.getElementById('modal-overlay').addEventListener('click', function(event) {
       if (event.target === this) closeModal();
@@ -158,49 +176,66 @@
       if (action === 'switch-view') {
         uiState.activeView = target.getAttribute('data-view');
         renderApp();
+        return;
       }
 
       if (action === 'open-add') {
         openAddModal(target.getAttribute('data-mode') || 'quick');
+        return;
       }
 
       if (action === 'delete-event') {
         Storage.deleteEvent(target.getAttribute('data-id'));
         renderApp();
         showToast('这段时间已移除');
+        return;
       }
 
       if (action === 'toggle-reminder') {
-        var rid = target.getAttribute('data-id');
+        var reminderId = target.getAttribute('data-id');
         var checked = target.getAttribute('data-done') === 'true';
-        Storage.updateReminder(rid, { done: !checked });
+        Storage.updateReminder(reminderId, { done: !checked });
         renderApp();
+        return;
       }
 
       if (action === 'open-journal') {
         openNoteModal('journal');
+        return;
       }
 
       if (action === 'open-reminder') {
         openNoteModal('reminder');
+        return;
       }
 
       if (action === 'submit-note') {
-        var noteType = target.getAttribute('data-note-type');
-        var textarea = document.getElementById('note-textarea');
-        var text = textarea ? textarea.value.trim() : '';
-        if (!text) { showToast('先写点什么'); return; }
-        if (noteType === 'journal') {
-          Storage.createJournal({ dayKey: uiState.currentDayKey, text: text });
-          showToast('已记下');
-        } else {
-          Storage.createReminder({ dayKey: uiState.currentDayKey, text: text });
-          showToast('提醒已添加');
-        }
+        submitNote(target.getAttribute('data-note-type'));
+        return;
+      }
+
+      if (action === 'close-modal') {
         closeModal();
-        renderApp();
       }
     });
+  }
+
+  function submitNote(noteType) {
+    var textarea = document.getElementById('note-textarea');
+    var text = textarea ? textarea.value.trim() : '';
+    if (!text) {
+      showToast('先写点什么');
+      return;
+    }
+    if (noteType === 'journal') {
+      Storage.createJournal({ dayKey: uiState.currentDayKey, text: text });
+      showToast('已记下');
+    } else {
+      Storage.createReminder({ dayKey: uiState.currentDayKey, text: text });
+      showToast('提醒已添加');
+    }
+    closeModal();
+    renderApp();
   }
 
   function navigateDay(offset) {
@@ -219,15 +254,20 @@
     var journal = Storage.getJournalByDay(dayKey);
     var reminders = Storage.getRemindersByDay(dayKey);
     var review = Storage.getReviewByDay(dayKey);
-    var weekDays = Storage.getWeekEvents(dayKey + 'T00:00:00');
+    var meals = Storage.getMealsByDay(dayKey);
+    var mealSummary = Storage.getMealSummaryByDay(dayKey);
+    var weekAggregate = Storage.getWeekAggregate(dayKey + 'T00:00:00');
+
     updateTopBar(dayKey);
 
     root.innerHTML =
       '<div class="page-stack">' +
         renderViewSwitch() +
         (uiState.activeView === 'today'
-          ? renderDayView(dayKey, events, summary, journal, reminders, review)
-          : renderWeekView(weekDays)) +
+          ? renderTodayView(events, summary, reminders, journal, review, mealSummary)
+          : uiState.activeView === 'food'
+            ? renderFoodView(meals, mealSummary)
+            : renderWeekView(weekAggregate)) +
       '</div>';
   }
 
@@ -238,111 +278,110 @@
     if (topDate) topDate.textContent = formatLongDate(date);
 
     var todayBtn = document.getElementById('btn-today');
-    if (todayBtn) {
-      todayBtn.style.display = dayKey === Storage.getTodayKey() ? 'none' : '';
-    }
+    if (todayBtn) todayBtn.style.display = dayKey === Storage.getTodayKey() ? 'none' : '';
   }
 
   function renderViewSwitch() {
     return '' +
       '<section class="view-switch">' +
-        '<button class="view-tab' + (uiState.activeView === 'today' ? ' is-active' : '') + '" data-action="switch-view" data-view="today">日视图</button>' +
-        '<button class="view-tab' + (uiState.activeView === 'week' ? ' is-active' : '') + '" data-action="switch-view" data-view="week">本周</button>' +
+        renderViewTab('today', '今天') +
+        renderViewTab('food', '饮食') +
+        renderViewTab('week', '本周') +
       '</section>';
   }
 
-  function renderDayView(dayKey, events, summary, journal, reminders, review) {
-    var isToday = dayKey === Storage.getTodayKey();
-    return '' +
-      renderStatusCard(events, summary, review) +
-      renderActionGrid(isToday) +
-      renderRemindersSection(reminders) +
-      renderTimeline(events, isToday) +
-      renderJournalSection(journal) +
-      renderReviewSection(review);
+  function renderViewTab(view, label) {
+    return '<button class="view-tab' + (uiState.activeView === view ? ' is-active' : '') + '" data-action="switch-view" data-view="' + view + '">' + escapeHtml(label) + '</button>';
   }
 
-  function renderActionGrid(isToday) {
-    if (isToday) {
-      return '' +
-        '<section class="action-grid">' +
-          '<button class="btn btn-secondary" data-action="open-add" data-mode="quick">记录此刻</button>' +
-          '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
-          '<button class="btn btn-secondary" data-action="open-journal">写点什么</button>' +
-          '<button class="btn btn-secondary" data-action="open-reminder">提醒一下</button>' +
-        '</section>';
-    }
+  function renderTodayView(events, summary, reminders, journal, review, mealSummary) {
     return '' +
-      '<section class="action-grid">' +
-        '<button class="btn btn-secondary" data-action="open-add" data-mode="manual">补记时间</button>' +
-        '<button class="btn btn-secondary" data-action="open-journal">写点什么</button>' +
-      '</section>';
+      renderHeroClock(events, summary) +
+      renderQuickGrid() +
+      renderMealTeaser(mealSummary) +
+      renderTimeline(events) +
+      renderNotesDeck(reminders, journal, review);
   }
 
-  function renderStatusCard(events, summary, review) {
-    var wakeUpText = '';
-    if (review && review.wakeUpMinutes) {
-      wakeUpText = '<div class="status-wake">起床时间: ' + escapeHtml(formatTime(review.wakeUpMinutes)) + '</div>';
-    }
+  function renderHeroClock(events, summary) {
     return '' +
-      '<section class="card status-card">' +
-        '<div class="status-card-inner">' +
-          '<div class="status-clock-wrap">' +
-            renderClockMini(events) +
+      '<section class="surface-card hero-card">' +
+        '<div class="hero-card-head">' +
+          '<div>' +
+            '<div class="eyebrow">今日钟面</div>' +
+            '<h2 class="hero-title">把今天落在一个钟面里</h2>' +
           '</div>' +
-          '<div class="status-info">' +
-            '<div class="status-headline">' +
-              '今日 ' + escapeHtml(String(summary.eventCount)) + ' 项活动 / ' + escapeHtml(formatDuration(summary.totalMinutes)) +
+          '<div class="hero-caption">' + escapeHtml(summary.eventCount + ' 段活动') + '</div>' +
+        '</div>' +
+        '<div class="hero-clock-layout">' +
+          '<div class="hero-clock-wrap">' +
+            renderClockFace(events, false) +
+          '</div>' +
+          '<div class="hero-aside">' +
+            '<div class="hero-copy">先看今天，再决定要不要继续记。这里保留了打开应用时最有仪式感的一眼。</div>' +
+            '<div class="metric-grid">' +
+              renderMetricCard('已记录', formatDuration(summary.totalMinutes), 'sage') +
+              renderMetricCard('留白', formatDuration(summary.blankMinutes), 'sand') +
+              renderMetricCard('节奏', summary.eventCount ? summary.eventCount + ' 段' : '刚开始', 'mist') +
             '</div>' +
-            wakeUpText +
           '</div>' +
         '</div>' +
+        renderActivityLegend(events) +
       '</section>';
   }
 
-  function renderClockMini(events) {
-    var summary = getSummaryFromEvents(events);
-    var gradientStyle = buildConicGradient(events);
+  function renderQuickGrid() {
+    var items = [
+      { action: 'open-add', mode: 'quick', label: '记录此刻', note: '刚做完一段，马上收下', icon: '●' },
+      { action: 'open-add', mode: 'manual', label: '补记时间', note: '把漏掉的时间补回来', icon: '◌' },
+      { action: 'open-journal', label: '写点什么', note: '留一句当下想法或感受', icon: '✦' },
+      { action: 'open-reminder', label: '提醒一下', note: '把待办轻轻挂在今天', icon: '☑' }
+    ];
+
     return '' +
-      '<div class="clock-face is-small" style="background:' + gradientStyle + ';">' +
-        '<div class="clock-core is-small"></div>' +
-        renderClockMarkers(true) +
-        '<div class="clock-center is-small">' +
-          '<div class="clock-total">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
-          '<div class="clock-caption">已记录</div>' +
+      '<section class="quick-grid">' +
+        items.map(function(item) {
+          return '' +
+            '<button class="quick-card" data-action="' + item.action + '"' + (item.mode ? ' data-mode="' + item.mode + '"' : '') + '>' +
+              '<div class="quick-icon">' + escapeHtml(item.icon) + '</div>' +
+              '<div class="quick-label">' + escapeHtml(item.label) + '</div>' +
+              '<div class="quick-note">' + escapeHtml(item.note) + '</div>' +
+            '</button>';
+        }).join('') +
+      '</section>';
+  }
+
+  function renderMealTeaser(mealSummary) {
+    var summaryText = mealSummary.count
+      ? '今天已整理 ' + mealSummary.count + ' 餐，约 ' + Math.round(mealSummary.calories) + ' kcal，蛋白质约 ' + Math.round(mealSummary.protein) + 'g'
+      : '饮食页已准备好，后面可以直接把对话里的吃饭内容整理进来。';
+    return '' +
+      '<button class="surface-card meal-teaser-card" data-action="switch-view" data-view="food">' +
+        '<div class="section-head compact-head">' +
+          '<div>' +
+            '<div class="eyebrow">饮食摘要</div>' +
+            '<h3 class="section-title">热量和蛋白只轻轻看一眼</h3>' +
+          '</div>' +
+          '<span class="inline-link">去饮食页</span>' +
         '</div>' +
-      '</div>';
+        '<p class="meal-teaser-text">' + escapeHtml(summaryText) + '</p>' +
+      '</button>';
   }
 
-  function renderRemindersSection(reminders) {
-    if (!reminders.length) return '';
-    var html =
-      '<section class="card reminder-card">' +
-        '<div class="card-header">提醒事项</div>' +
-        '<div class="reminder-list">';
-    reminders.forEach(function(item) {
-      var doneClass = item.done ? ' is-done' : '';
-      html +=
-        '<div class="reminder-item' + doneClass + '" data-action="toggle-reminder" data-id="' + escapeHtml(item.id) + '" data-done="' + (item.done ? 'true' : 'false') + '">' +
-          '<span class="reminder-check">' + (item.done ? '☑' : '☐') + '</span>' +
-          '<span class="reminder-text-line">' + escapeHtml(item.text) + '</span>' +
-        '</div>';
-    });
-    html += '</div></section>';
-    return html;
-  }
-
-  function renderTimeline(events, isToday) {
+  function renderTimeline(events) {
     var html =
       '<section class="section">' +
         '<div class="section-head">' +
-          '<h3 class="section-title">活动时间线</h3>' +
+          '<div>' +
+            '<div class="eyebrow">今日流动</div>' +
+            '<h3 class="section-title">时间线</h3>' +
+          '</div>' +
         '</div>';
 
     if (!events.length) {
       html +=
-        '<div class="card empty-card">' +
-          '<p class="empty-text">还没有记录，开始你的一天吧。</p>' +
+        '<div class="surface-card empty-card">' +
+          '<p class="empty-text">还没有记录，先把今天的第一段放进来。</p>' +
         '</div>';
     } else {
       html += '<div class="event-list">';
@@ -356,98 +395,254 @@
     return html;
   }
 
-  function renderJournalSection(journal) {
-    if (!journal.length) return '';
-    var html =
-      '<section class="card journal-card">' +
-        '<div class="card-header">今日随想</div>' +
-        '<div class="journal-list">';
-    journal.forEach(function(item) {
-      html +=
-        '<div class="journal-item">' +
-          '<span class="journal-quote">"</span>' +
-          '<span class="journal-text">' + escapeHtml(item.text) + '</span>' +
-          '<span class="journal-quote">"</span>' +
-        '</div>';
-    });
-    html += '</div></section>';
-    return html;
-  }
-
-  function renderReviewSection(review) {
-    if (!review) return '';
-    var html =
-      '<section class="card review-card">' +
-        '<div class="card-header">每日复盘</div>' +
-        '<div class="review-body">';
-    if (review.summary) {
-      html += '<p class="review-text">' + escapeHtml(review.summary) + '</p>';
-    }
-    if (review.highlights) {
-      html += '<p class="review-highlights">' + escapeHtml(review.highlights) + '</p>';
-    }
-    html += '</div></section>';
-    return html;
-  }
-
-  function renderSummaryStrip(summary) {
+  function renderNotesDeck(reminders, journal, review) {
     return '' +
-      '<section class="summary-strip">' +
-        renderMetric('片段', summary.eventCount + ' 段', 'is-green') +
-        renderMetric('记录', formatDuration(summary.totalMinutes), 'is-blue') +
-        renderMetric('留白', formatDuration(summary.blankMinutes), 'is-orange') +
+      '<section class="notes-grid">' +
+        renderReminderCard(reminders) +
+        renderJournalCard(journal) +
+        renderReviewCard(review) +
       '</section>';
   }
 
-  function renderMetric(label, value, className) {
-    return '' +
-      '<div class="metric-card ' + className + '">' +
-        '<div class="metric-label">' + escapeHtml(label) + '</div>' +
-        '<div class="metric-value">' + escapeHtml(value) + '</div>' +
-      '</div>';
+  function renderReminderCard(reminders) {
+    var html =
+      '<section class="surface-card note-card">' +
+        '<div class="card-headline">' +
+          '<div class="eyebrow">提醒</div>' +
+          '<h3 class="section-title">别忘了的事</h3>' +
+        '</div>';
+    if (!reminders.length) {
+      html += '<p class="empty-text">今天还没有提醒。</p>';
+    } else {
+      html += '<div class="reminder-list">';
+      reminders.forEach(function(item) {
+        html +=
+          '<div class="reminder-item' + (item.done ? ' is-done' : '') + '" data-action="toggle-reminder" data-id="' + escapeHtml(item.id) + '" data-done="' + (item.done ? 'true' : 'false') + '">' +
+            '<span class="reminder-check">' + (item.done ? '☑' : '☐') + '</span>' +
+            '<span class="reminder-text-line">' + escapeHtml(item.text) + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</section>';
+    return html;
   }
 
-  function renderWeekView(weekDays) {
+  function renderJournalCard(journal) {
+    var html =
+      '<section class="surface-card note-card">' +
+        '<div class="card-headline">' +
+          '<div class="eyebrow">随想</div>' +
+          '<h3 class="section-title">今天留下的话</h3>' +
+        '</div>';
+
+    if (!journal.length) {
+      html += '<p class="empty-text">还没有写点什么。</p>';
+    } else {
+      html += '<div class="journal-list">';
+      journal.forEach(function(item) {
+        html +=
+          '<div class="journal-item">' +
+            '<span class="journal-quote">“</span>' +
+            '<span class="journal-text">' + escapeHtml(item.text) + '</span>' +
+            '<span class="journal-quote">”</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</section>';
+    return html;
+  }
+
+  function renderReviewCard(review) {
+    var html =
+      '<section class="surface-card note-card">' +
+        '<div class="card-headline">' +
+          '<div class="eyebrow">复盘</div>' +
+          '<h3 class="section-title">今天的收束</h3>' +
+        '</div>';
+
+    if (!review) {
+      html += '<p class="empty-text">今天还没有复盘。</p>';
+    } else {
+      if (review.summary) html += '<p class="review-text">' + escapeHtml(review.summary) + '</p>';
+      if (review.highlights) html += '<p class="review-highlight">' + escapeHtml(review.highlights) + '</p>';
+    }
+
+    html += '</section>';
+    return html;
+  }
+
+  function renderFoodView(meals, mealSummary) {
+    return '' +
+      '<section class="surface-card food-hero-card">' +
+        '<div class="card-headline">' +
+          '<div class="eyebrow">饮食页</div>' +
+          '<h2 class="hero-title">轻一点地看热量和蛋白</h2>' +
+        '</div>' +
+        '<div class="metric-grid food-metric-grid">' +
+          renderMetricCard('已记录', mealSummary.count ? mealSummary.count + ' 餐' : '0 餐', 'sage') +
+          renderMetricCard('热量', mealSummary.count ? Math.round(mealSummary.calories) + ' kcal' : '待整理', 'sand') +
+          renderMetricCard('蛋白质', mealSummary.count ? Math.round(mealSummary.protein) + ' g' : '待整理', 'mist') +
+        '</div>' +
+        '<p class="meal-source-note">后续这里会承接 AI 对话整理进来的餐次。首页只放摘要，这一页再展开看细节。</p>' +
+      '</section>' +
+      renderMealList(meals, mealSummary);
+  }
+
+  function renderMealList(meals, mealSummary) {
+    if (!meals.length) {
+      return '' +
+        '<section class="surface-card empty-card">' +
+          '<p class="empty-text">今天还没有整理出餐次。等你从对话里给到饮食内容后，这里会自动归成一餐一餐。</p>' +
+        '</section>';
+    }
+
+    var html = '<section class="meal-list">';
+    meals.forEach(function(meal) {
+      html += renderMealCard(meal);
+    });
+    html +=
+      '<section class="surface-card meal-tip-card">' +
+        '<div class="eyebrow">轻提示</div>' +
+        '<p class="meal-tip-text">' + escapeHtml(buildMealTip(mealSummary)) + '</p>' +
+      '</section>' +
+      '</section>';
+    return html;
+  }
+
+  function renderMealCard(meal) {
+    var meta = MEAL_TYPE_META[meal.mealType] || MEAL_TYPE_META.snack;
+    var html =
+      '<article class="surface-card meal-card">' +
+        '<div class="meal-card-head">' +
+          '<span class="meal-type-pill" style="background:' + meta.soft + '; color:' + meta.accent + ';">' + escapeHtml(meta.label) + '</span>' +
+          '<span class="meal-meta">' + escapeHtml(meal.confidence || 'AI 估算') + '</span>' +
+        '</div>' +
+        '<h3 class="meal-title">' + escapeHtml(meal.summary || meta.label) + '</h3>' +
+        '<div class="meal-stats">' +
+          '<div class="meal-stat"><span>热量</span><strong>' + escapeHtml(Math.round(meal.calories) + ' kcal') + '</strong></div>' +
+          '<div class="meal-stat"><span>蛋白质</span><strong>' + escapeHtml(Math.round(meal.protein) + ' g') + '</strong></div>' +
+        '</div>';
+
+    if (meal.items && meal.items.length) {
+      html += '<div class="meal-items">';
+      meal.items.forEach(function(item) {
+        html +=
+          '<div class="meal-item-row">' +
+            '<div class="meal-item-main">' +
+              '<span class="meal-item-name">' + escapeHtml(item.name) + '</span>' +
+              (item.amount ? '<span class="meal-item-amount">' + escapeHtml(item.amount) + '</span>' : '') +
+            '</div>' +
+            '<div class="meal-item-side">' + escapeHtml(Math.round(item.calories || 0) + ' kcal / ' + Math.round(item.protein || 0) + 'g') + '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+
+    if (meal.note) html += '<p class="meal-note">' + escapeHtml(meal.note) + '</p>';
+    html += '</article>';
+    return html;
+  }
+
+  function renderWeekView(weekAggregate) {
+    return '' +
+      '<section class="surface-card week-hero-card">' +
+        '<div class="card-headline">' +
+          '<div class="eyebrow">本周概览</div>' +
+          '<h2 class="hero-title">把一周的投入先汇总，再看每天</h2>' +
+        '</div>' +
+        '<div class="metric-grid">' +
+          renderMetricCard('总时长', formatDuration(weekAggregate.totalMinutes), 'sage') +
+          renderMetricCard('总段数', weekAggregate.totalEvents ? weekAggregate.totalEvents + ' 段' : '0 段', 'mist') +
+          renderMetricCard('有记录天数', weekAggregate.activeDays ? weekAggregate.activeDays + ' 天' : '0 天', 'sand') +
+        '</div>' +
+      '</section>' +
+      renderWeekBreakdown(weekAggregate.categories, weekAggregate.totalMinutes) +
+      renderWeekGrid(weekAggregate.weekDays);
+  }
+
+  function renderWeekBreakdown(categories, totalMinutes) {
+    var html =
+      '<section class="surface-card week-breakdown-card">' +
+        '<div class="card-headline">' +
+          '<div class="eyebrow">板块投入</div>' +
+          '<h3 class="section-title">这一周时间都落在哪些地方</h3>' +
+        '</div>';
+
+    if (!categories.length) {
+      html += '<p class="empty-text">这周还没有累计出投入板块。</p>';
+    } else {
+      html += '<div class="week-breakdown-list">';
+      categories.forEach(function(item) {
+        var meta = getActivityMeta(item.activity);
+        var ratio = totalMinutes ? (item.minutes / totalMinutes) * 100 : 0;
+        html +=
+          '<div class="week-breakdown-item">' +
+            '<div class="week-breakdown-top">' +
+              '<span class="week-breakdown-label">' + escapeHtml(meta.label) + '</span>' +
+              '<span class="week-breakdown-value">' + escapeHtml(formatDuration(item.minutes)) + '</span>' +
+            '</div>' +
+            '<div class="week-breakdown-bar">' +
+              '<span class="week-breakdown-fill" style="width:' + ratio.toFixed(1) + '%; background:linear-gradient(90deg, ' + meta.color + ', ' + mixHex(meta.color, '#ffffff', 0.15) + ');"></span>' +
+            '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</section>';
+    return html;
+  }
+
+  function renderWeekGrid(weekDays) {
     var html =
       '<section class="section">' +
         '<div class="section-head">' +
-          '<h3 class="section-title">本周缩影</h3>' +
+          '<div>' +
+            '<div class="eyebrow">每天</div>' +
+            '<h3 class="section-title">本周钟面</h3>' +
+          '</div>' +
         '</div>' +
         '<div class="week-grid">';
 
     weekDays.forEach(function(day) {
-      var summary = getSummaryFromEvents(day.events);
-      html +=
-        '<article class="card week-card">' +
-          '<div class="week-card-head">' +
-            '<div class="week-day">' + escapeHtml(formatShortDay(day.dayKey)) + '</div>' +
-            '<div class="week-minutes">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
-          '</div>' +
-          renderClockCard(day.events, summary, true) +
-        '</article>';
+      html += renderWeekDayCard(day);
     });
 
     html += '</div></section>';
     return html;
   }
 
-  function renderClockCard(events, summary, compact) {
-    var sizeClass = compact ? ' clock-card-compact' : '';
-    var gradientStyle = buildConicGradient(events);
+  function renderWeekDayCard(day) {
+    var summary = getSummaryFromEvents(day.events);
+    var topActivity = getTopActivity(day.events);
     return '' +
-      '<section class="card clock-card' + sizeClass + '">' +
-        '<div class="clock-wrap">' +
-          '<div class="clock-face' + (compact ? ' is-small' : '') + '" style="background:' + gradientStyle + ';">' +
-            '<div class="clock-core' + (compact ? ' is-small' : '') + '"></div>' +
-            renderClockMarkers(compact) +
-            '<div class="clock-center' + (compact ? ' is-small' : '') + '">' +
-              '<div class="clock-total">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
-              '<div class="clock-caption">' + escapeHtml(compact ? '已记录' : '落在钟面里') + '</div>' +
-            '</div>' +
+      '<article class="surface-card week-card">' +
+        '<div class="week-card-head">' +
+          '<div>' +
+            '<div class="week-day">' + escapeHtml(formatShortDay(day.dayKey)) + '</div>' +
+            '<div class="week-day-note">' + escapeHtml(topActivity ? ('最投入：' + getActivityMeta(topActivity).label) : '还没有记录') + '</div>' +
           '</div>' +
+          '<div class="week-minute-copy">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
         '</div>' +
-        (compact ? '' : renderActivitySummary(events)) +
-      '</section>';
+        '<div class="week-clock-wrap">' + renderClockFace(day.events, true) + '</div>' +
+      '</article>';
+  }
+
+  function renderClockFace(events, compact) {
+    var summary = getSummaryFromEvents(events);
+    var sizeClass = compact ? ' is-small' : '';
+    return '' +
+      '<div class="clock-face' + sizeClass + '" style="background:' + buildConicGradient(events) + ';">' +
+        '<div class="clock-core' + sizeClass + '"></div>' +
+        renderClockMarkers(compact) +
+        '<div class="clock-center' + sizeClass + '">' +
+          '<div class="clock-total">' + escapeHtml(formatDuration(summary.totalMinutes)) + '</div>' +
+          '<div class="clock-caption">' + escapeHtml(compact ? '已记录' : '今天收下') + '</div>' +
+        '</div>' +
+      '</div>';
   }
 
   function renderClockMarkers(compact) {
@@ -457,45 +652,54 @@
     }).join('');
   }
 
-  function renderActivitySummary(events) {
-    if (!events.length) return '';
+  function renderMetricCard(label, value, tone) {
+    return '' +
+      '<div class="metric-card tone-' + tone + '">' +
+        '<div class="metric-label">' + escapeHtml(label) + '</div>' +
+        '<div class="metric-value">' + escapeHtml(value) + '</div>' +
+      '</div>';
+  }
+
+  function renderActivityLegend(events) {
+    if (!events.length) return '<div class="legend-empty">今天还没有活动，钟面会在你开始记录后慢慢长出来。</div>';
+
     var totals = {};
     events.forEach(function(event) {
       totals[event.activity] = (totals[event.activity] || 0) + event.duration;
     });
+
     return '' +
       '<div class="clock-legend">' +
         Object.keys(totals).map(function(key) {
-          var activity = getActivityMeta(key);
-          var gradient = getActivityGradient(activity);
+          var meta = getActivityMeta(key);
           return '' +
-            '<div class="legend-chip" style="--legend-bg:' + activity.soft + '; --legend-text:' + activity.color + ';">' +
-              '<span class="legend-dot" style="background:linear-gradient(135deg, ' + gradient.from + ', ' + gradient.to + ');"></span>' +
-              '<span>' + escapeHtml(activity.label) + ' ' + escapeHtml(formatDuration(totals[key])) + '</span>' +
+            '<div class="legend-chip" style="--legend-soft:' + meta.soft + '; --legend-text:' + meta.color + ';">' +
+              '<span class="legend-dot" style="background:' + meta.color + ';"></span>' +
+              '<span>' + escapeHtml(meta.label + ' · ' + formatDuration(totals[key])) + '</span>' +
             '</div>';
         }).join('') +
       '</div>';
   }
 
   function renderEventCard(event) {
+    var meta = getActivityMeta(event.activity);
     var statuses = [];
     if (event.energy) statuses.push(renderStatusPill('energy', event.energy));
     if (event.mood) statuses.push(renderStatusPill('mood', event.mood));
     if (event.body) statuses.push(renderStatusPill('body', event.body));
-    var tags = Array.isArray(event.tags) ? event.tags.filter(Boolean) : [];
 
-    var meta = getActivityMeta(event.activity);
-    var modeLabel = event.inputMode === 'ai' ? 'AI' : (event.inputMode === 'manual' ? '补记' : '刚做完');
     return '' +
-      '<article class="card event-card">' +
+      '<article class="surface-card event-card">' +
         '<div class="event-top">' +
           '<div class="event-main">' +
-            '<div class="event-type" style="background:' + meta.soft + '; color:' + meta.color + ';">' + escapeHtml(meta.icon) + ' ' + escapeHtml(meta.label) + '</div>' +
-            '<div class="event-time">' + formatTime(event.startMinutes) + ' - ' + formatTime(event.endMinutes) + '</div>' +
+            '<div class="event-header-row">' +
+              '<span class="event-type" style="background:' + meta.soft + '; color:' + meta.color + ';">' + escapeHtml(meta.icon + ' ' + meta.label) + '</span>' +
+              '<span class="event-mode">' + escapeHtml(getModeLabel(event.inputMode)) + '</span>' +
+            '</div>' +
+            '<div class="event-time">' + escapeHtml(formatTime(event.startMinutes) + ' - ' + formatTime(event.endMinutes)) + '</div>' +
           '</div>' +
           '<div class="event-side">' +
             '<div class="event-duration">' + escapeHtml(formatDuration(event.duration)) + '</div>' +
-            '<div class="event-mode">' + escapeHtml(modeLabel) + '</div>' +
             '<button class="event-delete" data-action="delete-event" data-id="' + escapeHtml(event.id) + '" aria-label="删除">' +
               '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
                 '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path>' +
@@ -504,111 +708,94 @@
           '</div>' +
         '</div>' +
         (statuses.length ? '<div class="event-status-row">' + statuses.join('') + '</div>' : '') +
-        (tags.length ? '<div class="event-tags-row">' + tags.map(function(tag) { return '<span class="event-tag">' + escapeHtml(tag) + '</span>'; }).join('') + '</div>' : '') +
+        (event.tags && event.tags.length ? '<div class="event-tags-row">' + event.tags.map(renderTagPill).join('') + '</div>' : '') +
         (event.note ? '<div class="event-note">' + escapeHtml(event.note) + '</div>' : '') +
       '</article>';
   }
 
+  function renderTagPill(tag) {
+    var bg = mixHex(tag.color, '#ffffff', 0.82);
+    return '<span class="event-tag" style="background:' + bg + '; color:' + tag.color + '; border-color:' + mixHex(tag.color, '#ffffff', 0.5) + ';">' + escapeHtml(tag.text) + '</span>';
+  }
+
   function renderStatusPill(group, value) {
     var option = getStatusOption(group, value);
-    if (!option) return '';
     var labelMap = { energy: '精力', mood: '情绪', body: '身体' };
+    if (!option) return '';
     return '<span class="status-pill" style="background:' + option.soft + '; color:' + option.text + ';">' + escapeHtml(labelMap[group] + ' · ' + option.label) + '</span>';
   }
 
   function openNoteModal(type) {
     var isJournal = type === 'journal';
-    var title = isJournal ? '写点什么' : '提醒一下';
-    var placeholder = isJournal ? '此刻的想法、感受、碎碎念...' : '提醒自己要做的事...';
-    var btnLabel = isJournal ? '记下来' : '添加提醒';
-    setModal(title, '' +
+    setModal(isJournal ? '写点什么' : '提醒一下', '' +
       '<div class="modal-stack">' +
-        '<textarea class="text-area" id="note-textarea" maxlength="500" rows="4" placeholder="' + escapeHtml(placeholder) + '" autofocus></textarea>' +
+        '<textarea class="text-area" id="note-textarea" maxlength="500" rows="4" placeholder="' + escapeHtml(isJournal ? '此刻的想法、感受、碎碎念...' : '提醒自己要做的事...') + '" autofocus></textarea>' +
         '<div class="modal-actions">' +
-          '<button class="btn btn-secondary" data-action="close-modal" onclick="document.getElementById(\'modal-overlay\').classList.remove(\'show\')">取消</button>' +
-          '<button class="btn btn-primary" data-action="submit-note" data-note-type="' + type + '">' + escapeHtml(btnLabel) + '</button>' +
+          '<button class="btn btn-secondary" data-action="close-modal">取消</button>' +
+          '<button class="btn btn-primary" data-action="submit-note" data-note-type="' + type + '">' + escapeHtml(isJournal ? '记下来' : '添加提醒') + '</button>' +
         '</div>' +
       '</div>');
     setTimeout(function() {
-      var ta = document.getElementById('note-textarea');
-      if (ta) ta.focus();
-    }, 100);
+      var input = document.getElementById('note-textarea');
+      if (input) input.focus();
+    }, 60);
   }
 
   function openAddModal(mode) {
     addFormState = getDefaultAddState();
     addFormState.mode = mode || 'quick';
     addFormState.dayKey = uiState.currentDayKey;
+
     if (addFormState.mode === 'quick') {
       var now = new Date();
       var endMinutes = roundToFive(now.getHours() * 60 + now.getMinutes());
       addFormState.endTime = formatTime(endMinutes);
       addFormState.startTime = formatTime(Math.max(0, endMinutes - addFormState.duration));
     }
-    setModal(addFormState.mode === 'manual' ? '补记时间' : '记下一段', renderAddForm());
+
+    setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
     bindAddFormEvents();
   }
 
   function renderAddForm() {
-    var primaryFields = addFormState.mode === 'quick'
-      ? '<div class="field-group">' +
-          '<div class="field-label">活动类型</div>' +
-          '<div class="chip-grid activity-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
-        '</div>' +
-        renderQuickFields()
-      : renderManualFields() +
-        '<div class="field-group">' +
-          '<div class="field-label">活动类型</div>' +
-          '<div class="chip-grid activity-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
-        '</div>';
-
     return '' +
       '<form class="modal-stack" id="add-form">' +
         '<div class="mode-switch">' +
           '<button type="button" class="mode-chip' + (addFormState.mode === 'quick' ? ' is-active' : '') + '" data-mode-choice="quick">刚做完</button>' +
           '<button type="button" class="mode-chip' + (addFormState.mode === 'manual' ? ' is-active' : '') + '" data-mode-choice="manual">补记时间</button>' +
         '</div>' +
-        primaryFields +
-        '<div class="field-group">' +
-          '<div class="field-label">自定义活动</div>' +
-          '<div class="custom-activity-row">' +
-            '<input class="text-input" id="custom-activity-input" type="text" maxlength="12" placeholder="比如：收拾屋子" value="' + escapeHtml(addFormState.customActivity) + '">' +
-            '<button type="button" class="btn btn-soft custom-activity-btn" id="add-custom-activity">加入活动</button>' +
-          '</div>' +
-        '</div>' +
+        renderPrimaryFields() +
+        renderActivityField() +
+        renderTagField() +
         renderStatusField('energy', '精力') +
         renderStatusField('mood', '情绪') +
         renderStatusField('body', '身体') +
-        '<div class="field-group">' +
-          '<div class="field-label">自由标签</div>' +
-          '<input class="text-input" id="event-tags" type="text" maxlength="40" placeholder="可写多个，用逗号隔开，比如：家务, 清洁" value="' + escapeHtml(addFormState.tags) + '">' +
-        '</div>' +
         '<div class="field-group note-group">' +
-          '<button type="button" class="text-link" id="toggle-note">' + (addFormState.noteOpen ? '收起备注' : '添加备注') + '</button>' +
+          '<button type="button" class="text-link" id="toggle-note">' + (addFormState.noteOpen ? '收起备注' : '加一句备注') + '</button>' +
           (addFormState.noteOpen
-            ? '<textarea class="text-area" id="event-note" maxlength="80" placeholder="一句话就够了"></textarea>'
+            ? '<textarea class="text-area" id="event-note" maxlength="100" placeholder="一句话就够">' + escapeHtml(addFormState.note) + '</textarea>'
             : '<input type="hidden" id="event-note" value="' + escapeHtml(addFormState.note) + '">') +
         '</div>' +
         '<div class="modal-actions">' +
           '<button type="button" class="btn btn-secondary" id="cancel-add">取消</button>' +
-          '<button type="submit" class="btn btn-primary">' + (addFormState.mode === 'quick' ? '收下这段时间' : '补上这段时间') + '</button>' +
+          '<button type="submit" class="btn btn-primary">' + escapeHtml(addFormState.mode === 'quick' ? '收下这段时间' : '补上这段时间') + '</button>' +
         '</div>' +
       '</form>';
   }
 
-  function renderQuickFields() {
-    return '' +
-      '<div class="field-group">' +
-        '<div class="field-label">刚刚这一段，持续了多久</div>' +
-        '<div class="duration-grid" id="duration-grid">' + renderDurationChips() + '</div>' +
-        '<input class="custom-duration" id="custom-duration" type="number" min="5" step="5" placeholder="或直接输入分钟数">' +
-      '</div>';
-  }
+  function renderPrimaryFields() {
+    if (addFormState.mode === 'quick') {
+      return '' +
+        '<div class="field-group">' +
+          '<div class="field-label">刚刚这一段，大概多久</div>' +
+          '<div class="duration-grid" id="duration-grid">' + renderDurationChips() + '</div>' +
+          '<input class="custom-duration" id="custom-duration" type="number" min="5" step="5" placeholder="也可以直接输入分钟数">' +
+        '</div>';
+    }
 
-  function renderManualFields() {
     return '' +
       '<div class="manual-grid">' +
-        '<div class="field-group field-group-date">' +
+        '<div class="field-group">' +
           '<div class="field-label">补记日期</div>' +
           '<input class="text-input" id="manual-day" type="date" value="' + escapeHtml(addFormState.dayKey) + '">' +
         '</div>' +
@@ -622,14 +809,55 @@
             '<input class="text-input" id="manual-end" type="time" step="300" value="' + escapeHtml(addFormState.endTime) + '">' +
           '</div>' +
         '</div>' +
-      '</div>' +
-      '<div class="helper-text">把开始和结束填完整就行；如果和已有记录重叠，保存前会提醒你怎么处理。</div>';
+        '<div class="helper-text">开始和结束时间填完整就行，重叠时会提示你怎么处理。</div>' +
+      '</div>';
+  }
+
+  function renderActivityField() {
+    return '' +
+      '<div class="field-group">' +
+        '<div class="field-label">活动类型</div>' +
+        '<div class="chip-grid activity-grid" id="activity-grid">' + renderActivityChips() + '</div>' +
+        '<div class="custom-activity-row">' +
+          '<input class="text-input" id="custom-activity-input" type="text" maxlength="12" placeholder="不在上面时，可加一个新活动" value="' + escapeHtml(addFormState.customActivity) + '">' +
+          '<button type="button" class="btn btn-soft custom-activity-btn" id="add-custom-activity">加入活动</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function renderTagField() {
+    var tagLibrary = Storage.getTagLibrary();
+    var selectedTags = tagLibrary.filter(function(tag) {
+      return addFormState.selectedTagIds.indexOf(tag.id) >= 0;
+    });
+    return '' +
+      '<div class="field-group">' +
+        '<div class="field-label">标签</div>' +
+        (selectedTags.length
+          ? '<div class="selected-tags-row">' + selectedTags.map(renderTagPill).join('') + '</div>'
+          : '<div class="helper-text">可以给这段时间贴上自己的彩色标签。</div>') +
+        '<div class="chip-grid tag-library-grid" id="tag-library">' +
+          tagLibrary.map(function(tag) {
+            var selected = addFormState.selectedTagIds.indexOf(tag.id) >= 0 ? ' is-selected' : '';
+            return '<button type="button" class="choice-chip tag-choice' + selected + '" data-tag-id="' + escapeHtml(tag.id) + '" style="--chip-bg:' + mixHex(tag.color, '#ffffff', 0.84) + '; --chip-text:' + tag.color + ';">' + escapeHtml(tag.text) + '</button>';
+          }).join('') +
+        '</div>' +
+        '<div class="custom-tag-builder">' +
+          '<input class="text-input" id="custom-tag-text" type="text" maxlength="10" placeholder="新建标签文字" value="' + escapeHtml(addFormState.newTagText) + '">' +
+          '<div class="tag-color-palette" id="tag-color-palette">' +
+            TAG_COLOR_OPTIONS.map(function(option) {
+              return '<button type="button" class="tag-color-dot' + (addFormState.newTagColor === option.value ? ' is-selected' : '') + '" data-tag-color="' + option.value + '" aria-label="' + escapeHtml(option.label) + '" style="background:' + option.value + ';"></button>';
+            }).join('') +
+          '</div>' +
+          '<button type="button" class="btn btn-soft" id="add-custom-tag">保存这个标签</button>' +
+        '</div>' +
+      '</div>';
   }
 
   function renderStatusField(group, label) {
     return '' +
       '<div class="field-group">' +
-        '<div class="field-label">' + label + '</div>' +
+        '<div class="field-label">' + escapeHtml(label) + '</div>' +
         '<div class="chip-grid status-grid" id="' + group + '-grid">' + renderStatusChips(group) + '</div>' +
       '</div>';
   }
@@ -652,19 +880,17 @@
   function renderStatusChips(group) {
     return STATUS_OPTIONS[group].map(function(option) {
       var selected = addFormState[group] === option.value ? ' is-selected' : '';
-      return '<button type="button" class="choice-chip status-choice' + selected + '" data-status-group="' + group + '" data-status-value="' + option.value + '" title="' + escapeHtml(option.note) + '" style="--chip-bg:' + option.soft + '; --chip-text:' + option.text + ';">' + escapeHtml(option.label) + '</button>';
+      return '<button type="button" class="choice-chip status-choice' + selected + '" data-status-group="' + group + '" data-status-value="' + option.value + '" style="--chip-bg:' + option.soft + '; --chip-text:' + option.text + ';">' + escapeHtml(option.label) + '</button>';
     }).join('');
   }
 
   function bindAddFormEvents() {
     document.getElementById('cancel-add').addEventListener('click', closeModal);
-    document.getElementById('event-note').value = addFormState.note;
-    document.getElementById('event-tags').addEventListener('input', function() {
-      addFormState.tags = this.value;
-    });
+
     document.getElementById('custom-activity-input').addEventListener('input', function() {
       addFormState.customActivity = this.value;
     });
+
     document.getElementById('add-custom-activity').addEventListener('click', function() {
       var label = document.getElementById('custom-activity-input').value.trim();
       if (!label) {
@@ -673,26 +899,27 @@
       }
       addFormState.activity = saveCustomActivity(label);
       addFormState.customActivity = '';
-      setModal('记下这一段', renderAddForm());
+      setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
       bindAddFormEvents();
       showToast('已经加入活动');
     });
+
     document.getElementById('toggle-note').addEventListener('click', function() {
       addFormState.note = document.getElementById('event-note').value.trim();
-      addFormState.tags = document.getElementById('event-tags').value.trim();
+      addFormState.newTagText = document.getElementById('custom-tag-text').value.trim();
       addFormState.customActivity = document.getElementById('custom-activity-input').value.trim();
       addFormState.noteOpen = !addFormState.noteOpen;
-      setModal('记下这一段', renderAddForm());
+      setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
       bindAddFormEvents();
     });
 
     document.querySelectorAll('[data-mode-choice]').forEach(function(node) {
       node.addEventListener('click', function() {
         addFormState.note = document.getElementById('event-note').value.trim();
-        addFormState.tags = document.getElementById('event-tags').value.trim();
+        addFormState.newTagText = document.getElementById('custom-tag-text').value.trim();
         addFormState.customActivity = document.getElementById('custom-activity-input').value.trim();
         addFormState.mode = node.getAttribute('data-mode-choice');
-        setModal(addFormState.mode === 'manual' ? '补记时间' : '记下一段', renderAddForm());
+        setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
         bindAddFormEvents();
       });
     });
@@ -702,6 +929,40 @@
       if (!target) return;
       addFormState.activity = target.getAttribute('data-activity');
       refreshFormSelections();
+    });
+
+    document.getElementById('tag-library').addEventListener('click', function(event) {
+      var target = event.target.closest('[data-tag-id]');
+      if (!target) return;
+      toggleSelectedTag(target.getAttribute('data-tag-id'));
+      refreshFormSelections();
+    });
+
+    document.getElementById('tag-color-palette').addEventListener('click', function(event) {
+      var target = event.target.closest('[data-tag-color]');
+      if (!target) return;
+      addFormState.newTagColor = target.getAttribute('data-tag-color');
+      refreshFormSelections();
+    });
+
+    document.getElementById('custom-tag-text').addEventListener('input', function() {
+      addFormState.newTagText = this.value;
+    });
+
+    document.getElementById('add-custom-tag').addEventListener('click', function() {
+      var text = document.getElementById('custom-tag-text').value.trim();
+      if (!text) {
+        showToast('先写标签文字');
+        return;
+      }
+      var created = Storage.createTag({ text: text, color: addFormState.newTagColor });
+      if (created && addFormState.selectedTagIds.indexOf(created.id) === -1) {
+        addFormState.selectedTagIds.push(created.id);
+      }
+      addFormState.newTagText = '';
+      setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
+      bindAddFormEvents();
+      showToast('标签已保存');
     });
 
     if (addFormState.mode === 'quick') {
@@ -746,19 +1007,30 @@
     });
   }
 
+  function toggleSelectedTag(tagId) {
+    var index = addFormState.selectedTagIds.indexOf(tagId);
+    if (index >= 0) {
+      addFormState.selectedTagIds.splice(index, 1);
+    } else {
+      addFormState.selectedTagIds.push(tagId);
+    }
+  }
+
   function submitAddForm(strategy) {
     addFormState.note = document.getElementById('event-note').value.trim();
-    addFormState.tags = document.getElementById('event-tags').value.trim();
+
     var payload = {
       activity: addFormState.activity,
       note: addFormState.note,
-      tags: parseTagInput(addFormState.tags),
+      tags: Storage.getTagLibrary().filter(function(tag) {
+        return addFormState.selectedTagIds.indexOf(tag.id) >= 0;
+      }),
       energy: addFormState.energy,
       mood: addFormState.mood,
       body: addFormState.body
     };
-    var result;
 
+    var result;
     if (addFormState.mode === 'quick') {
       payload.duration = addFormState.duration;
       if (!payload.activity || !payload.duration) {
@@ -796,9 +1068,11 @@
       '<div class="modal-stack">' +
         '<div class="reminder-box">' +
           '<p class="reminder-text">这段时间和已有记录重叠了。你可以覆盖重叠部分，或者保留两条并排存在。</p>' +
-          '<div class="conflict-list">' + result.overlaps.map(function(item) {
-            return '<div class="conflict-item">' + escapeHtml(formatTime(item.startMinutes) + ' - ' + formatTime(item.endMinutes) + ' · ' + getActivityMeta(item.activity).label) + '</div>';
-          }).join('') + '</div>' +
+          '<div class="conflict-list">' +
+            result.overlaps.map(function(item) {
+              return '<div class="conflict-item">' + escapeHtml(formatTime(item.startMinutes) + ' - ' + formatTime(item.endMinutes) + ' · ' + getActivityMeta(item.activity).label) + '</div>';
+            }).join('') +
+          '</div>' +
         '</div>' +
         '<div class="modal-actions">' +
           '<button class="btn btn-secondary" id="conflict-keep">保留两条</button>' +
@@ -825,6 +1099,12 @@
       var group = node.getAttribute('data-status-group');
       var value = node.getAttribute('data-status-value');
       node.classList.toggle('is-selected', addFormState[group] === value);
+    });
+    document.querySelectorAll('[data-tag-id]').forEach(function(node) {
+      node.classList.toggle('is-selected', addFormState.selectedTagIds.indexOf(node.getAttribute('data-tag-id')) >= 0);
+    });
+    document.querySelectorAll('[data-tag-color]').forEach(function(node) {
+      node.classList.toggle('is-selected', node.getAttribute('data-tag-color') === addFormState.newTagColor);
     });
   }
 
@@ -898,31 +1178,6 @@
     return value;
   }
 
-  function parseTagInput(input) {
-    return String(input || '')
-      .split(/[，,、]/)
-      .map(function(item) { return item.trim(); })
-      .filter(Boolean)
-      .slice(0, 6);
-  }
-
-  function buildCustomActivityColors(seed) {
-    var palette = [
-      { color: '#a5c0ae', soft: '#f1f7f3' },
-      { color: '#b5aed0', soft: '#f5f2fa' },
-      { color: '#d1b39e', soft: '#faf3ee' },
-      { color: '#a8bacd', soft: '#f1f5f8' }
-    ];
-    var index = Math.abs(hashString(seed || 'custom')) % palette.length;
-    return palette[index];
-  }
-
-  function hashString(value) {
-    return String(value || '').split('').reduce(function(sum, char) {
-      return ((sum << 5) - sum) + char.charCodeAt(0);
-    }, 0);
-  }
-
   function getStatusOption(group, value) {
     return STATUS_OPTIONS[group].find(function(item) {
       return item.value === value;
@@ -940,15 +1195,41 @@
     };
   }
 
-  function getActivityGradient(meta) {
-    return {
-      from: mixHex(meta.color, '#ffffff', 0.2),
-      to: meta.color
-    };
+  function getTopActivity(events) {
+    var totals = {};
+    events.forEach(function(event) {
+      totals[event.activity] = (totals[event.activity] || 0) + event.duration;
+    });
+    var bestKey = '';
+    var bestMinutes = 0;
+    Object.keys(totals).forEach(function(key) {
+      if (totals[key] > bestMinutes) {
+        bestMinutes = totals[key];
+        bestKey = key;
+      }
+    });
+    return bestKey;
+  }
+
+  function buildCustomActivityColors(seed) {
+    var palette = [
+      { color: '#607E54', soft: '#EEF3E5' },
+      { color: '#4D6F9A', soft: '#EAF0F8' },
+      { color: '#8A6A9E', soft: '#F2ECF8' },
+      { color: '#B46A51', soft: '#F9EDE8' }
+    ];
+    return palette[Math.abs(hashString(seed)) % palette.length];
+  }
+
+  function buildMealTip(summary) {
+    if (!summary.count) return '饮食页会在以后承接 AI 整理出来的每一餐。';
+    if (summary.protein >= 75) return '今天蛋白质已经比较稳了，继续保持现在这种轻记录就够。';
+    if (summary.protein >= 45) return '今天蛋白质在中段，晚一点如果能再补一小份会更均衡。';
+    return '今天蛋白质偏少一些，下一餐可以稍微优先考虑蛋白来源。';
   }
 
   function buildConicGradient(events) {
-    var trackColor = '#f7f4ef';
+    var trackColor = '#F2EEE7';
     if (!events.length) return trackColor;
 
     var sorted = events.slice().sort(function(a, b) {
@@ -961,26 +1242,19 @@
       var endDeg = (event.endMinutes / 1440) * 360;
       if (endDeg <= startDeg) return;
       var meta = getActivityMeta(event.activity);
-      segments.push({ start: startDeg, end: endDeg, color: mixHex(meta.color, '#ffffff', 0.6) });
+      segments.push({ start: startDeg, end: endDeg, color: meta.color });
     });
+
     if (!segments.length) return trackColor;
 
-    var stops = [];
-    var fade = 10;
-
-    stops.push(trackColor + ' 0deg');
-
+    var stops = [trackColor + ' 0deg'];
     segments.forEach(function(seg) {
-      // Fade from track to segment over ~fade degrees
-      stops.push(trackColor + ' ' + Math.max(0, seg.start - fade).toFixed(1) + 'deg');
+      stops.push(trackColor + ' ' + Math.max(0, seg.start - 4).toFixed(1) + 'deg');
       stops.push(seg.color + ' ' + seg.start.toFixed(1) + 'deg');
       stops.push(seg.color + ' ' + seg.end.toFixed(1) + 'deg');
-      // Fade from segment back to track
-      stops.push(trackColor + ' ' + Math.min(360, seg.end + fade).toFixed(1) + 'deg');
+      stops.push(trackColor + ' ' + Math.min(360, seg.end + 4).toFixed(1) + 'deg');
     });
-
     stops.push(trackColor + ' 360deg');
-
     return 'conic-gradient(from 0deg, ' + stops.join(', ') + ')';
   }
 
@@ -1010,6 +1284,12 @@
     }).join('');
   }
 
+  function hashString(value) {
+    return String(value || '').split('').reduce(function(sum, char) {
+      return ((sum << 5) - sum) + char.charCodeAt(0);
+    }, 0);
+  }
+
   function parseTime(value) {
     if (!value || value.indexOf(':') === -1) return null;
     var parts = value.split(':');
@@ -1020,6 +1300,7 @@
   }
 
   var roundToFive = Storage.roundToFive;
+  var pad = Storage.pad;
 
   function formatDuration(minutes) {
     if (!minutes) return '0 分钟';
@@ -1046,7 +1327,9 @@
     return pad(date.getMonth() + 1) + '/' + pad(date.getDate()) + ' 周' + weekdays[date.getDay()];
   }
 
-  var pad = Storage.pad;
+  function getModeLabel(mode) {
+    return mode === 'manual' ? '补记' : (mode === 'ai' ? 'AI' : '刚做完');
+  }
 
   function escapeHtml(value) {
     return String(value || '')

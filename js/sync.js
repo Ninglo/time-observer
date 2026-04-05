@@ -2,11 +2,13 @@ var Sync = (function() {
   var GIST_ID = '1dc49b8714cfebb11624078f58d88d3b';
   var GIST_FILE = 'time-observer-init.json';
   var GIST_URL = 'https://api.github.com/gists/' + GIST_ID;
-  var STORAGE_KEY = 'quiet_life_records_v2';
+  var STORAGE_KEY = 'quiet_life_records_v3';
+  var LEGACY_STORAGE_KEY = 'quiet_life_records_v2';
 
   function readLocalState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) raw = localStorage.getItem(LEGACY_STORAGE_KEY);
       if (!raw) return getDefaultState();
       var parsed = JSON.parse(raw);
       return normalize(parsed);
@@ -21,7 +23,9 @@ var Sync = (function() {
       outings: [],
       journal: [],
       reminders: [],
-      reviews: []
+      reviews: [],
+      meals: [],
+      tagLibrary: []
     };
   }
 
@@ -31,12 +35,15 @@ var Sync = (function() {
       outings: Array.isArray(state.outings) ? state.outings : [],
       journal: Array.isArray(state.journal) ? state.journal : [],
       reminders: Array.isArray(state.reminders) ? state.reminders : [],
-      reviews: Array.isArray(state.reviews) ? state.reviews : []
+      reviews: Array.isArray(state.reviews) ? state.reviews : [],
+      meals: Array.isArray(state.meals) ? state.meals : [],
+      tagLibrary: Array.isArray(state.tagLibrary) ? state.tagLibrary : []
     };
   }
 
   function saveLocalState(state) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(state));
   }
 
   function mergeArrayById(localArr, remoteArr) {
@@ -89,7 +96,9 @@ var Sync = (function() {
         outings: mergeArrayById(local.outings, remote.outings),
         journal: mergeArrayById(local.journal, remote.journal),
         reminders: mergeArrayById(local.reminders, remote.reminders),
-        reviews: mergeArrayById(local.reviews, remote.reviews)
+        reviews: mergeArrayById(local.reviews, remote.reviews),
+        meals: mergeArrayById(local.meals, remote.meals),
+        tagLibrary: mergeArrayById(local.tagLibrary, remote.tagLibrary)
       };
 
       saveLocalState(merged);

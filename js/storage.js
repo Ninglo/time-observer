@@ -1,5 +1,7 @@
 var Storage = (function() {
-  var STORAGE_KEY = 'quiet_life_records_v2';
+  var STORAGE_KEY = 'quiet_life_records_v3';
+  var LEGACY_STORAGE_KEY = 'quiet_life_records_v2';
+  var DEFAULT_TAG_COLORS = ['#7F9A65', '#B46D5B', '#C69138', '#4F7B78', '#856B9D', '#4E6FAE'];
 
   function getDefaultState() {
     return {
@@ -7,22 +9,20 @@ var Storage = (function() {
       outings: [],
       journal: [],
       reminders: [],
-      reviews: []
+      reviews: [],
+      meals: [],
+      tagLibrary: []
     };
   }
 
   function readState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      }
       if (!raw) return getDefaultState();
-      var parsed = JSON.parse(raw);
-      return {
-        events: Array.isArray(parsed.events) ? parsed.events : [],
-        outings: Array.isArray(parsed.outings) ? parsed.outings : [],
-        journal: Array.isArray(parsed.journal) ? parsed.journal : [],
-        reminders: Array.isArray(parsed.reminders) ? parsed.reminders : [],
-        reviews: Array.isArray(parsed.reviews) ? parsed.reviews : []
-      };
+      return normalizeState(JSON.parse(raw));
     } catch (error) {
       console.error('读取记录失败', error);
       return getDefaultState();
@@ -30,7 +30,39 @@ var Storage = (function() {
   }
 
   function saveState(state) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    var normalized = normalizeState(state);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(normalized));
+  }
+
+  function normalizeState(parsed) {
+    var state = getDefaultState();
+    var tags = Array.isArray(parsed && parsed.tagLibrary) ? parsed.tagLibrary.map(normalizeTag).filter(Boolean) : [];
+    var tagMap = buildTagMap(tags);
+
+    state.outings = Array.isArray(parsed && parsed.outings) ? parsed.outings : [];
+    state.journal = Array.isArray(parsed && parsed.journal) ? parsed.journal : [];
+    state.reminders = Array.isArray(parsed && parsed.reminders) ? parsed.reminders : [];
+    state.reviews = Array.isArray(parsed && parsed.reviews) ? parsed.reviews : [];
+    state.meals = Array.isArray(parsed && parsed.meals) ? parsed.meals.map(normalizeMeal).filter(Boolean) : [];
+
+    state.events = Array.isArray(parsed && parsed.events)
+      ? parsed.events.map(function(item) {
+          return normalizeEvent(item, tagMap);
+        }).filter(Boolean)
+      : [];
+
+    state.events.forEach(function(event) {
+      event.tags.forEach(function(tag) {
+        if (!tagMap[tag.id]) {
+          tagMap[tag.id] = tag;
+          tags.push(tag);
+        }
+      });
+    });
+
+    state.tagLibrary = sortTags(tags);
+    return state;
   }
 
   function generateId() {
@@ -62,19 +94,50 @@ var Storage = (function() {
     return now.getHours() * 60 + now.getMinutes();
   }
 
-  function normalizeEvent(raw) {
+  function normalizeTag(raw) {
+    if (!raw && raw !== '') return null;
+    if (typeof raw === 'string') {
+      var label = String(raw).trim();
+      if (!label) return null;
+      return {
+        id: 'tag_' + hashString(label),
+        text: label,
+        color: pickDefaultTagColor(label),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    var text = String(raw.text || raw.label || '').trim();
+    if (!text) return null;
+    return {
+      id: raw.id || ('tag_' + hashString(text + (raw.color || ''))),
+      text: text,
+      color: normalizeHex(raw.color || pickDefaultTagColor(text)),
+      createdAt: raw.createdAt || new Date().toISOString(),
+      updatedAt: raw.updatedAt || new Date().toISOString()
+    };
+  }
+
+  function normalizeEvent(raw, tagMap) {
+    if (!raw) return null;
     var startMinutes = clampMinutes(Number(raw.startMinutes) || 0);
     var endMinutes = clampMinutes(Number(raw.endMinutes) || startMinutes);
     if (endMinutes <= startMinutes) endMinutes = clampMinutes(startMinutes + (Number(raw.duration) || 0));
     if (endMinutes <= startMinutes) endMinutes = clampMinutes(startMinutes + 5);
+
+    var rawTags = Array.isArray(raw.tags) ? raw.tags : [];
+    var tags = rawTags.map(function(item) {
+      if (item && item.id && tagMap && tagMap[item.id]) return tagMap[item.id];
+      return normalizeTag(item);
+    }).filter(Boolean);
+
     return {
       id: raw.id || generateId(),
       dayKey: raw.dayKey || getTodayKey(),
       activity: raw.activity || 'study',
       note: raw.note || '',
-      tags: Array.isArray(raw.tags)
-        ? raw.tags.map(function(item) { return String(item || '').trim(); }).filter(Boolean)
-        : [],
+      tags: dedupeTags(tags),
       energy: raw.energy || '',
       mood: raw.mood || '',
       body: raw.body || '',
@@ -87,16 +150,72 @@ var Storage = (function() {
     };
   }
 
+  function normalizeMeal(raw) {
+    if (!raw) return null;
+    var mealType = raw.mealType || raw.type || 'snack';
+    var items = Array.isArray(raw.items)
+      ? raw.items.map(function(item) {
+          var name = String(item.name || '').trim();
+          if (!name) return null;
+          return {
+            name: name,
+            amount: String(item.amount || '').trim(),
+            calories: Number(item.calories) || 0,
+            protein: Number(item.protein) || 0
+          };
+        }).filter(Boolean)
+      : [];
+
+    return {
+      id: raw.id || generateId(),
+      dayKey: raw.dayKey || getTodayKey(),
+      mealType: mealType,
+      summary: String(raw.summary || '').trim(),
+      source: raw.source || 'ai',
+      confidence: raw.confidence || '',
+      items: items,
+      calories: Number(raw.calories) || items.reduce(function(sum, item) { return sum + (Number(item.calories) || 0); }, 0),
+      protein: Number(raw.protein) || items.reduce(function(sum, item) { return sum + (Number(item.protein) || 0); }, 0),
+      note: String(raw.note || '').trim(),
+      createdAt: raw.createdAt || new Date().toISOString(),
+      updatedAt: raw.updatedAt || new Date().toISOString()
+    };
+  }
+
   function sortEvents(events) {
     return events.sort(function(a, b) {
       if (a.dayKey !== b.dayKey) return a.dayKey < b.dayKey ? -1 : 1;
       if (a.startMinutes !== b.startMinutes) return a.startMinutes - b.startMinutes;
-      return a.createdAt < b.createdAt ? -1 : 1;
+      return (a.createdAt || '') < (b.createdAt || '') ? -1 : 1;
     });
   }
 
+  function sortTags(tags) {
+    return tags.slice().sort(function(a, b) {
+      return a.text.localeCompare(b.text, 'zh-Hans-CN');
+    });
+  }
+
+  function buildTagMap(tags) {
+    var map = {};
+    tags.forEach(function(tag) {
+      map[tag.id] = tag;
+    });
+    return map;
+  }
+
+  function dedupeTags(tags) {
+    var map = {};
+    tags.forEach(function(tag) {
+      map[tag.id] = tag;
+    });
+    return Object.keys(map).map(function(key) { return map[key]; });
+  }
+
   function getAllEvents() {
-    return sortEvents(readState().events.map(normalizeEvent));
+    return sortEvents(readState().events.map(function(item) {
+      return normalizeEvent(item);
+    }).filter(Boolean));
   }
 
   function getEventsByDay(dayKey) {
@@ -136,6 +255,40 @@ var Storage = (function() {
     });
   }
 
+  function getWeekAggregate(baseDate) {
+    var weekDays = getWeekEvents(baseDate);
+    var totalsByActivity = {};
+    var totalMinutes = 0;
+    var totalEvents = 0;
+    var activeDays = 0;
+
+    weekDays.forEach(function(day) {
+      if (day.events.length) activeDays += 1;
+      day.events.forEach(function(event) {
+        totalsByActivity[event.activity] = (totalsByActivity[event.activity] || 0) + event.duration;
+        totalMinutes += event.duration;
+        totalEvents += 1;
+      });
+    });
+
+    var categories = Object.keys(totalsByActivity).map(function(key) {
+      return {
+        activity: key,
+        minutes: totalsByActivity[key]
+      };
+    }).sort(function(a, b) {
+      return b.minutes - a.minutes;
+    });
+
+    return {
+      totalMinutes: totalMinutes,
+      totalEvents: totalEvents,
+      activeDays: activeDays,
+      categories: categories,
+      weekDays: weekDays
+    };
+  }
+
   function findOverlaps(target, events) {
     return events.filter(function(item) {
       return item.dayKey === target.dayKey &&
@@ -149,19 +302,22 @@ var Storage = (function() {
     var state = readState();
     var event;
     var now = new Date();
+    var selectedTags = Array.isArray(input.tags) ? input.tags.map(normalizeTag).filter(Boolean) : [];
 
     if (mode === 'manual') {
       event = normalizeEvent({
         activity: input.activity,
         note: input.note,
-        tags: input.tags,
+        tags: selectedTags,
         energy: input.energy,
         mood: input.mood,
         body: input.body,
         inputMode: 'manual',
         dayKey: input.dayKey || getTodayKey(),
         startMinutes: roundToFive(input.startMinutes),
-        endMinutes: roundToFive(input.endMinutes)
+        endMinutes: roundToFive(input.endMinutes),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString()
       });
     } else {
       var endMinutes = roundToFive(getCurrentMinutes());
@@ -169,7 +325,7 @@ var Storage = (function() {
       event = normalizeEvent({
         activity: input.activity,
         note: input.note,
-        tags: input.tags,
+        tags: selectedTags,
         energy: input.energy,
         mood: input.mood,
         body: input.body,
@@ -182,7 +338,9 @@ var Storage = (function() {
       });
     }
 
-    var existing = state.events.map(normalizeEvent);
+    var existing = state.events.map(function(item) {
+      return normalizeEvent(item);
+    }).filter(Boolean);
     var overlaps = findOverlaps(event, existing);
     if (overlaps.length && strategy !== 'replace' && strategy !== 'keep') {
       return {
@@ -204,6 +362,7 @@ var Storage = (function() {
       state.events = existing;
     }
 
+    mergeTagsIntoLibrary(state, event.tags);
     state.events.push(event);
     state.events = sortEvents(state.events).map(function(item) {
       item.updatedAt = item.id === event.id ? now.toISOString() : item.updatedAt;
@@ -223,6 +382,72 @@ var Storage = (function() {
       return item.id !== id;
     });
     saveState(state);
+  }
+
+  function getTagLibrary() {
+    return readState().tagLibrary.map(normalizeTag).filter(Boolean);
+  }
+
+  function createTag(data) {
+    var state = readState();
+    var tag = normalizeTag({
+      text: data.text,
+      color: data.color,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    if (!tag) return null;
+
+    var existing = state.tagLibrary.find(function(item) {
+      return item.text === tag.text && normalizeHex(item.color) === normalizeHex(tag.color);
+    });
+    if (existing) return normalizeTag(existing);
+
+    state.tagLibrary.push(tag);
+    state.tagLibrary = sortTags(state.tagLibrary.map(normalizeTag).filter(Boolean));
+    saveState(state);
+    return tag;
+  }
+
+  function mergeTagsIntoLibrary(state, tags) {
+    var map = buildTagMap((state.tagLibrary || []).map(normalizeTag).filter(Boolean));
+    tags.forEach(function(tag) {
+      if (!map[tag.id]) {
+        map[tag.id] = tag;
+      }
+    });
+    state.tagLibrary = sortTags(Object.keys(map).map(function(key) {
+      return map[key];
+    }));
+  }
+
+  function getMealsByDay(dayKey) {
+    return readState().meals.filter(function(item) {
+      return item.dayKey === dayKey;
+    }).sort(function(a, b) {
+      var order = mealSortWeight(a.mealType) - mealSortWeight(b.mealType);
+      if (order !== 0) return order;
+      return (a.createdAt || '') < (b.createdAt || '') ? -1 : 1;
+    });
+  }
+
+  function getMealSummaryByDay(dayKey) {
+    var meals = getMealsByDay(dayKey);
+    return meals.reduce(function(result, meal) {
+      result.count += 1;
+      result.calories += Number(meal.calories) || 0;
+      result.protein += Number(meal.protein) || 0;
+      return result;
+    }, { count: 0, calories: 0, protein: 0 });
+  }
+
+  function createMeal(data) {
+    var state = readState();
+    var meal = normalizeMeal(data);
+    if (!meal) return null;
+    state.meals.push(meal);
+    saveState(state);
+    return meal;
   }
 
   function getRecentOuting() {
@@ -265,7 +490,6 @@ var Storage = (function() {
     return getSummaryByDay(getTodayKey());
   }
 
-  // --- Journal CRUD ---
   function getJournalByDay(dayKey) {
     var state = readState();
     return state.journal.filter(function(item) {
@@ -290,7 +514,6 @@ var Storage = (function() {
     return entry;
   }
 
-  // --- Reminders CRUD ---
   function getRemindersByDay(dayKey) {
     var state = readState();
     return state.reminders.filter(function(item) {
@@ -330,7 +553,6 @@ var Storage = (function() {
     saveState(state);
   }
 
-  // --- Reviews CRUD ---
   function getReviewByDay(dayKey) {
     var state = readState();
     var matches = state.reviews.filter(function(item) {
@@ -357,7 +579,7 @@ var Storage = (function() {
 
   function exportData() {
     var payload = JSON.stringify({
-      version: 2,
+      version: 3,
       exportedAt: new Date().toISOString(),
       data: readState()
     }, null, 2);
@@ -372,6 +594,35 @@ var Storage = (function() {
     URL.revokeObjectURL(url);
   }
 
+  function hashString(value) {
+    return Math.abs(String(value || '').split('').reduce(function(sum, char) {
+      return ((sum << 5) - sum) + char.charCodeAt(0);
+    }, 0));
+  }
+
+  function pickDefaultTagColor(seed) {
+    return DEFAULT_TAG_COLORS[hashString(seed) % DEFAULT_TAG_COLORS.length];
+  }
+
+  function normalizeHex(color) {
+    var value = String(color || '').trim();
+    if (!value) return '#7F9A65';
+    if (value.charAt(0) !== '#') value = '#' + value;
+    if (value.length === 4) {
+      value = '#' + value.charAt(1) + value.charAt(1) + value.charAt(2) + value.charAt(2) + value.charAt(3) + value.charAt(3);
+    }
+    return value.length === 7 ? value.toUpperCase() : '#7F9A65';
+  }
+
+  function mealSortWeight(type) {
+    return {
+      breakfast: 1,
+      lunch: 2,
+      dinner: 3,
+      snack: 4
+    }[type] || 9;
+  }
+
   return {
     getTodayKey: getTodayKey,
     getDayKey: getDayKey,
@@ -379,6 +630,7 @@ var Storage = (function() {
     getEventsByDay: getEventsByDay,
     getWeekKeys: getWeekKeys,
     getWeekEvents: getWeekEvents,
+    getWeekAggregate: getWeekAggregate,
     getSummaryByDay: getSummaryByDay,
     getTodaySummary: getTodaySummary,
     getRecentOuting: getRecentOuting,
@@ -393,6 +645,11 @@ var Storage = (function() {
     updateReminder: updateReminder,
     getReviewByDay: getReviewByDay,
     createReview: createReview,
+    getTagLibrary: getTagLibrary,
+    createTag: createTag,
+    getMealsByDay: getMealsByDay,
+    getMealSummaryByDay: getMealSummaryByDay,
+    createMeal: createMeal,
     pad: pad,
     roundToFive: roundToFive
   };
