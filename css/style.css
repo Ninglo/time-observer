@@ -1015,7 +1015,7 @@ button {
   .meal-card,
   .note-card,
   .meal-teaser-card {
-    padding: 18px;
+    padding: 16px;
   }
 
   .hero-clock-layout,
@@ -1032,6 +1032,15 @@ button {
 
   .metric-grid {
     gap: 8px;
+  }
+
+  .metric-card {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .metric-value {
+    font-size: 16px;
   }
 
   .hero-aside {
@@ -1093,6 +1102,71 @@ button {
 
   .quick-label {
     font-size: 17px;
+  }
+
+  .quick-card {
+    padding: 16px;
+  }
+
+  .quick-note,
+  .meal-source-note,
+  .meal-teaser-text,
+  .meal-tip-text,
+  .review-text,
+  .review-highlight,
+  .journal-item,
+  .empty-text {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .meal-card {
+    gap: 12px;
+  }
+
+  .food-hero-card .hero-title,
+  .week-hero-card .hero-title {
+    font-size: 30px;
+  }
+
+  .week-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .week-card-head {
+    margin: 0;
+  }
+
+  .week-clock-wrap {
+    margin-top: 0;
+  }
+
+  .week-card .clock-face.is-small {
+    width: 108px;
+    height: 108px;
+  }
+
+  .week-card .clock-core.is-small,
+  .week-card .clock-center.is-small {
+    inset: 16px;
+  }
+
+  .week-card .clock-total {
+    font-size: 14px;
+  }
+
+  .week-card .clock-caption,
+  .week-day-note,
+  .week-minute-copy {
+    font-size: 12px;
+  }
+
+  .empty-card {
+    padding: 18px;
   }
 
   .meal-item-row {
