@@ -1,7 +1,7 @@
 var Storage = (function() {
   var STORAGE_KEY = 'quiet_life_records_v3';
   var LEGACY_STORAGE_KEY = 'quiet_life_records_v2';
-  var DEFAULT_TAG_COLORS = ['#9CCBFF', '#F6C2D9', '#F6E27A', '#AEE8D8', '#C9BCFF', '#BDE87B'];
+  var DEFAULT_TAG_COLORS = ['#9CCBFF', '#AEE8D8', '#F6E27A', '#F6C2D9', '#C9BCFF', '#BDE87B', '#BFE3FF', '#FFD9C8', '#D9F2D0'];
   var LEGACY_TAG_COLOR_MAP = {
     '#607E54': '#AEE8D8',
     '#4D6F9A': '#9CCBFF',
@@ -14,7 +14,10 @@ var Storage = (function() {
     '#C69138': '#F6E27A',
     '#4F7B78': '#AEE8D8',
     '#856B9D': '#C9BCFF',
-    '#4E6FAE': '#9CCBFF'
+    '#4E6FAE': '#9CCBFF',
+    '#BFE3FF': '#BFE3FF',
+    '#FFD9C8': '#FFD9C8',
+    '#D9F2D0': '#D9F2D0'
   };
 
   function getDefaultState() {

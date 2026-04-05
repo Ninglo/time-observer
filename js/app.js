@@ -49,13 +49,31 @@
   };
 
   var DURATION_OPTIONS = [15, 30, 45, 60, 90, 120, 150, 180];
-  var TAG_COLOR_OPTIONS = [
-    { value: '#9CCBFF', label: '天蓝' },
-    { value: '#F6C2D9', label: '樱粉' },
-    { value: '#F6E27A', label: '奶黄' },
-    { value: '#AEE8D8', label: '薄荷' },
-    { value: '#C9BCFF', label: '雾紫' },
-    { value: '#BDE87B', label: '青柠' }
+  var TAG_COLOR_GROUPS = [
+    {
+      label: '清晨组',
+      colors: [
+        { value: '#9CCBFF', label: '天蓝' },
+        { value: '#AEE8D8', label: '薄荷' },
+        { value: '#F6E27A', label: '奶黄' }
+      ]
+    },
+    {
+      label: '花园组',
+      colors: [
+        { value: '#F6C2D9', label: '樱粉' },
+        { value: '#C9BCFF', label: '雾紫' },
+        { value: '#BDE87B', label: '青柠' }
+      ]
+    },
+    {
+      label: '云朵组',
+      colors: [
+        { value: '#BFE3FF', label: '冰蓝' },
+        { value: '#FFD9C8', label: '蜜桃' },
+        { value: '#D9F2D0', label: '浅苔' }
+      ]
+    }
   ];
 
   var MEAL_TYPE_META = {
@@ -90,7 +108,7 @@
       noteOpen: false,
       selectedTagIds: [],
       newTagText: '',
-      newTagColor: TAG_COLOR_OPTIONS[0].value
+      newTagColor: TAG_COLOR_GROUPS[0].colors[0].value
     };
   }
 
@@ -838,9 +856,17 @@
         '</div>' +
         '<div class="custom-tag-builder">' +
           '<input class="text-input" id="custom-tag-text" type="text" maxlength="10" placeholder="新建标签文字" value="' + escapeHtml(addFormState.newTagText) + '">' +
-          '<div class="tag-color-palette" id="tag-color-palette">' +
-            TAG_COLOR_OPTIONS.map(function(option) {
-              return '<button type="button" class="tag-color-dot' + (addFormState.newTagColor === option.value ? ' is-selected' : '') + '" data-tag-color="' + option.value + '" aria-label="' + escapeHtml(option.label) + '" style="background:' + option.value + ';"></button>';
+          '<div class="tag-palette-stack" id="tag-color-palette">' +
+            TAG_COLOR_GROUPS.map(function(group) {
+              return '' +
+                '<div class="tag-palette-group">' +
+                  '<div class="tag-group-label">' + escapeHtml(group.label) + '</div>' +
+                  '<div class="tag-color-palette">' +
+                    group.colors.map(function(option) {
+                      return '<button type="button" class="tag-color-dot' + (addFormState.newTagColor === option.value ? ' is-selected' : '') + '" data-tag-color="' + option.value + '" aria-label="' + escapeHtml(option.label) + '" title="' + escapeHtml(option.label) + '" style="background:' + option.value + ';"></button>';
+                    }).join('') +
+                  '</div>' +
+                '</div>';
             }).join('') +
           '</div>' +
           '<button type="button" class="btn btn-soft" id="add-custom-tag">保存这个标签</button>' +
