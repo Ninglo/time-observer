@@ -3,25 +3,25 @@
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
 
   var ACTIVITY_OPTIONS = [
-    { value: 'study', label: '学习', icon: '读' },
-    { value: 'coding', label: '编码', icon: '码' },
-    { value: 'work', label: '工作', icon: '工' },
-    { value: 'exercise', label: '运动', icon: '动' },
-    { value: 'social', label: '社交', icon: '聊' },
-    { value: 'cook', label: '做饭', icon: '煮' },
-    { value: 'rest', label: '休息', icon: '歇' },
-    { value: 'nothing', label: '放空', icon: '云' }
+    { value: 'study', label: '学习', icon: '📚' },
+    { value: 'coding', label: '编码', icon: '💻' },
+    { value: 'work', label: '工作', icon: '🩵' },
+    { value: 'exercise', label: '运动', icon: '🌿' },
+    { value: 'social', label: '社交', icon: '💬' },
+    { value: 'cook', label: '做饭', icon: '🍳' },
+    { value: 'rest', label: '休息', icon: '🛋️' },
+    { value: 'nothing', label: '摆烂', icon: '🤍' }
   ];
 
   var ACTIVITY_PALETTES = {
-    study: { color: '#607E54', soft: '#EEF3E5' },
-    coding: { color: '#4D6F9A', soft: '#EAF0F8' },
-    work: { color: '#8A6A9E', soft: '#F2ECF8' },
-    exercise: { color: '#B46A51', soft: '#F9EDE8' },
-    social: { color: '#B06A77', soft: '#F8EBEF' },
-    cook: { color: '#B9893E', soft: '#FBF1E1' },
-    rest: { color: '#567A7A', soft: '#E8F2F1' },
-    nothing: { color: '#7A746B', soft: '#F1EEEA' }
+    study: { color: '#A18AD8', soft: '#F1EBFF' },
+    coding: { color: '#7DB8D6', soft: '#EAF8FF' },
+    work: { color: '#79A6E8', soft: '#EBF3FF' },
+    exercise: { color: '#82BC73', soft: '#EEF9E8' },
+    social: { color: '#DE88AA', soft: '#FDECF3' },
+    cook: { color: '#E1B642', soft: '#FFF7DA' },
+    rest: { color: '#78C8B6', soft: '#E8FBF5' },
+    nothing: { color: '#B8B1A8', soft: '#FCFBF8' }
   };
 
   var STATUS_OPTIONS = {
@@ -579,7 +579,7 @@
       html +=
         '<div class="week-breakdown-item">' +
           '<div class="week-breakdown-top">' +
-            '<span class="week-breakdown-label">' + escapeHtml(meta.label) + '</span>' +
+            '<span class="week-breakdown-label">' + escapeHtml(meta.icon + ' ' + meta.label) + '</span>' +
             '<span class="week-breakdown-value">' + escapeHtml(formatDuration(item.minutes)) + '</span>' +
           '</div>' +
           '<div class="week-breakdown-bar">' +
@@ -669,7 +669,7 @@
           return '' +
             '<div class="legend-chip" style="--legend-soft:' + meta.soft + '; --legend-text:' + meta.color + ';">' +
               '<span class="legend-dot" style="background:' + meta.color + ';"></span>' +
-              '<span>' + escapeHtml(meta.label + ' · ' + formatDuration(totals[key])) + '</span>' +
+              '<span>' + escapeHtml(meta.icon + ' ' + meta.label + ' · ' + formatDuration(totals[key])) + '</span>' +
             '</div>';
         }).join('') +
       '</div>';
@@ -683,7 +683,7 @@
     if (event.body) statuses.push(renderStatusPill('body', event.body));
 
     return '' +
-      '<article class="surface-card event-card">' +
+      '<article class="surface-card event-card" style="--event-soft:' + meta.soft + '; --event-accent:' + meta.color + ';">' +
         '<div class="event-top">' +
           '<div class="event-main">' +
             '<div class="event-header-row">' +
@@ -860,7 +860,7 @@
     return getAllActivityOptions().map(function(option) {
       var meta = getActivityMeta(option.value);
       var selected = addFormState.activity === option.value ? ' is-selected' : '';
-      return '<button type="button" class="choice-chip' + selected + '" data-activity="' + option.value + '" style="--chip-bg:' + meta.soft + '; --chip-text:' + meta.color + ';">' + escapeHtml(option.label) + '</button>';
+      return '<button type="button" class="choice-chip' + selected + '" data-activity="' + option.value + '" style="--chip-bg:' + meta.soft + '; --chip-text:' + meta.color + ';">' + escapeHtml(meta.icon + ' ' + option.label) + '</button>';
     }).join('');
   }
 

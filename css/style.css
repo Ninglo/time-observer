@@ -5,7 +5,7 @@
 }
 
 :root {
-  --bg: #fbf8f3;
+  --bg: #fffdf8;
   --bg-soft: #fffdf9;
   --surface: rgba(255, 253, 249, 0.72);
   --surface-strong: rgba(255, 253, 249, 0.88);
@@ -14,8 +14,8 @@
   --text: #2d2924;
   --text-soft: #6c645a;
   --text-faint: #90857a;
-  --accent: #7b9270;
-  --accent-soft: #f1f5ed;
+  --accent: #8ea583;
+  --accent-soft: #f2f8ee;
   --sand: #faf3e8;
   --mist: #f1f4f9;
   --shadow-sm: 0 6px 18px rgba(76, 60, 41, 0.045);
@@ -45,9 +45,10 @@ body {
   font-family: "得意黑", "Smiley Sans", -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(217, 227, 205, 0.32), transparent 28%),
-    radial-gradient(circle at top right, rgba(242, 226, 208, 0.28), transparent 30%),
-    radial-gradient(circle at 50% 75%, rgba(223, 229, 241, 0.22), transparent 34%),
+    radial-gradient(circle at top left, rgba(255, 212, 217, 0.22), transparent 26%),
+    radial-gradient(circle at top right, rgba(255, 245, 118, 0.18), transparent 28%),
+    radial-gradient(circle at 20% 72%, rgba(159, 232, 255, 0.14), transparent 26%),
+    radial-gradient(circle at 82% 74%, rgba(176, 237, 186, 0.16), transparent 28%),
     var(--bg);
   -webkit-font-smoothing: antialiased;
   line-height: 1.55;
@@ -473,7 +474,21 @@ button {
 }
 
 .event-card {
+  position: relative;
   padding: 14px;
+  background: linear-gradient(180deg, rgba(255, 253, 249, 0.96) 0%, var(--event-soft, rgba(255, 253, 249, 0.96)) 100%);
+  border-color: rgba(128, 113, 93, 0.08);
+}
+
+.event-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 28px 28px 0 0;
+  background: var(--event-accent, transparent);
 }
 
 .event-main {
