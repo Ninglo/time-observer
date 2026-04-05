@@ -9,11 +9,11 @@
   --bg-soft: #fffdf9;
   --surface: rgba(255, 253, 249, 0.72);
   --surface-strong: rgba(255, 253, 249, 0.88);
-  --border: rgba(128, 113, 93, 0.1);
-  --border-strong: rgba(128, 113, 93, 0.16);
+  --border: rgba(182, 196, 221, 0.22);
+  --border-strong: rgba(182, 196, 221, 0.32);
   --text: #2d2924;
-  --text-soft: #6c645a;
-  --text-faint: #90857a;
+  --text-soft: #6f6d78;
+  --text-faint: #9ca1b3;
   --accent: #8ea583;
   --accent-soft: #f2f8ee;
   --sand: #faf3e8;
@@ -74,9 +74,9 @@ button {
   justify-content: space-between;
   gap: 12px;
   padding: 0 max(var(--screen-pad), env(safe-area-inset-left));
-  background: rgba(247, 242, 234, 0.78);
+  background: rgba(248, 250, 255, 0.82);
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(128, 113, 93, 0.12);
+  border-bottom: 1px solid var(--border);
 }
 
 .title-wrap {
@@ -147,8 +147,8 @@ button {
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   padding: 6px;
-  background: rgba(255, 251, 245, 0.76);
-  border: 1px solid rgba(128, 113, 93, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--border);
   border-radius: 999px;
   box-shadow: var(--shadow-sm);
 }
@@ -285,7 +285,7 @@ button {
 .metric-card {
   padding: 12px;
   border-radius: 16px;
-  border: 1px solid rgba(128, 113, 93, 0.08);
+  border: 1px solid rgba(182, 196, 221, 0.14);
 }
 
 .metric-card.tone-sage {
@@ -293,7 +293,7 @@ button {
 }
 
 .metric-card.tone-sand {
-  background: rgba(247, 239, 225, 0.95);
+  background: rgba(255, 247, 214, 0.9);
 }
 
 .metric-card.tone-mist {
@@ -323,7 +323,7 @@ button {
   aspect-ratio: 1;
   border-radius: 50%;
   box-shadow:
-    0 0 0 1px rgba(128, 113, 93, 0.12),
+    0 0 0 1px rgba(182, 196, 221, 0.22),
     0 18px 36px rgba(76, 60, 41, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
@@ -477,7 +477,7 @@ button {
   position: relative;
   padding: 14px;
   background: linear-gradient(180deg, rgba(255, 253, 249, 0.96) 0%, var(--event-soft, rgba(255, 253, 249, 0.96)) 100%);
-  border-color: rgba(128, 113, 93, 0.08);
+  border-color: rgba(182, 196, 221, 0.16);
 }
 
 .event-card::before {
@@ -593,7 +593,7 @@ button {
   align-items: flex-start;
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(255, 250, 245, 0.72);
+  background: rgba(255, 255, 255, 0.74);
 }
 
 .reminder-item.is-done {
@@ -605,7 +605,7 @@ button {
   margin: 0;
   padding: 14px;
   border-radius: 16px;
-  background: rgba(255, 251, 245, 0.82);
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .note-card.note-card-compact {
@@ -653,8 +653,8 @@ button {
 .meal-stat {
   padding: 12px 14px;
   border-radius: 16px;
-  background: rgba(255, 251, 245, 0.78);
-  border: 1px solid rgba(128, 113, 93, 0.1);
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(182, 196, 221, 0.16);
 }
 
 .meal-stat span,
@@ -682,7 +682,7 @@ button {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 0;
-  border-top: 1px solid rgba(128, 113, 93, 0.1);
+  border-top: 1px solid rgba(182, 196, 221, 0.16);
 }
 
 .meal-item-main {
@@ -776,7 +776,7 @@ button {
   justify-content: space-between;
   padding: 18px;
   background: rgba(255, 252, 247, 0.94);
-  border-bottom: 1px solid rgba(128, 113, 93, 0.12);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(14px);
 }
 
@@ -794,7 +794,7 @@ button {
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   padding: 6px;
-  background: rgba(245, 239, 231, 0.9);
+  background: rgba(244, 247, 253, 0.92);
   border-radius: 999px;
 }
 
@@ -852,8 +852,8 @@ button {
   min-height: 38px;
   padding: 0 12px;
   border-radius: 999px;
-  background: rgba(255, 251, 245, 0.94);
-  border: 1px solid rgba(128, 113, 93, 0.14);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(182, 196, 221, 0.18);
   color: var(--text-soft);
 }
 
@@ -875,9 +875,9 @@ button {
 .text-input,
 .text-area {
   width: 100%;
-  border: 1px solid rgba(128, 113, 93, 0.16);
+  border: 1px solid rgba(182, 196, 221, 0.2);
   border-radius: 18px;
-  background: rgba(255, 251, 245, 0.94);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--text);
 }
 
@@ -911,7 +911,7 @@ button {
   height: 28px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 1px rgba(128, 113, 93, 0.08);
+  box-shadow: 0 0 0 1px rgba(182, 196, 221, 0.16);
 }
 
 .tag-color-dot.is-selected {
@@ -952,13 +952,13 @@ button {
 .reminder-box {
   padding: 18px;
   border-radius: 18px;
-  background: linear-gradient(145deg, rgba(248, 239, 225, 0.96), rgba(255, 251, 245, 0.96));
+  background: linear-gradient(145deg, rgba(247, 249, 255, 0.96), rgba(255, 255, 255, 0.96));
 }
 
 .conflict-item {
   padding: 10px 12px;
   border-radius: 14px;
-  background: rgba(255, 251, 245, 0.9);
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .btn {
@@ -978,8 +978,8 @@ button {
 }
 
 .btn-secondary {
-  background: rgba(255, 251, 245, 0.96);
-  border: 1px solid rgba(128, 113, 93, 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(182, 196, 221, 0.18);
   color: var(--text);
 }
 
@@ -1015,7 +1015,7 @@ button {
   }
 
   .btn-icon:hover {
-    background: rgba(255, 251, 245, 0.92);
+    background: rgba(248, 250, 255, 0.94);
     color: var(--text);
   }
 }

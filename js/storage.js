@@ -52,6 +52,12 @@ var Storage = (function() {
     localStorage.setItem(LEGACY_STORAGE_KEY, JSON.stringify(normalized));
   }
 
+  function migrateStoredState() {
+    var normalized = normalizeState(readState());
+    saveState(normalized);
+    return normalized;
+  }
+
   function normalizeState(parsed) {
     var state = getDefaultState();
     var tags = Array.isArray(parsed && parsed.tagLibrary) ? parsed.tagLibrary.map(normalizeTag).filter(Boolean) : [];
@@ -764,6 +770,7 @@ var Storage = (function() {
     getMealSummaryByDay: getMealSummaryByDay,
     createMeal: createMeal,
     syncMealsFromJournal: syncMealsFromJournal,
+    migrateStoredState: migrateStoredState,
     pad: pad,
     roundToFive: roundToFive
   };

@@ -113,6 +113,7 @@
   }
 
   function init() {
+    Storage.migrateStoredState();
     bindGlobalEvents();
     bindBackgroundSyncEvents();
     renderVersionFooter();
@@ -126,6 +127,7 @@
       '</div>';
     updateTopBar(uiState.currentDayKey);
     autoSync(function() {
+      Storage.migrateStoredState();
       startBackgroundSync();
       renderApp();
     });
@@ -260,6 +262,7 @@
   function syncAndRenderIfIdle() {
     if (document.hidden) return;
     autoSync(function() {
+      Storage.migrateStoredState();
       if (!document.getElementById('modal-overlay').classList.contains('show')) {
         renderApp();
       }
@@ -1233,10 +1236,10 @@
 
   function buildCustomActivityColors(seed) {
     var palette = [
-      { color: '#607E54', soft: '#EEF3E5' },
-      { color: '#4D6F9A', soft: '#EAF0F8' },
-      { color: '#8A6A9E', soft: '#F2ECF8' },
-      { color: '#B46A51', soft: '#F9EDE8' }
+      { color: '#71B89C', soft: '#EDF8F3' },
+      { color: '#6EA3E6', soft: '#EEF5FF' },
+      { color: '#A78DE6', soft: '#F5F0FF' },
+      { color: '#F2A8B9', soft: '#FFF2F6' }
     ];
     return palette[Math.abs(hashString(seed)) % palette.length];
   }
