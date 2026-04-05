@@ -1,6 +1,24 @@
 @font-face {
   font-family: "得意黑";
-  src: url("../fonts/SmileySans-Oblique.ttf.woff2") format("woff2");
+  src:
+    local("得意黑"),
+    local("Smiley Sans"),
+    url("../fonts/deyihei.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-synthesis: none;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Smiley Sans";
+  src:
+    local("得意黑"),
+    local("Smiley Sans"),
+    url("../fonts/deyihei.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-synthesis: none;
   font-display: swap;
 }
 
