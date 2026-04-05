@@ -306,19 +306,12 @@
   function renderHeroClock(events, summary) {
     return '' +
       '<section class="surface-card hero-card">' +
-        '<div class="hero-card-head">' +
-          '<div>' +
-            '<div class="eyebrow">今日钟面</div>' +
-            '<h2 class="hero-title">把今天落在一个钟面里</h2>' +
-          '</div>' +
-          '<div class="hero-caption">' + escapeHtml(summary.eventCount + ' 段活动') + '</div>' +
-        '</div>' +
+        '<div class="hero-summary-line">' + escapeHtml('今天已记录 ' + formatDuration(summary.totalMinutes) + ' · ' + summary.eventCount + ' 段') + '</div>' +
         '<div class="hero-clock-layout">' +
           '<div class="hero-clock-wrap">' +
             renderClockFace(events, false) +
           '</div>' +
           '<div class="hero-aside">' +
-            '<div class="hero-copy">先看今天，再决定要不要继续记。这里保留了打开应用时最有仪式感的一眼。</div>' +
             '<div class="metric-grid">' +
               renderMetricCard('已记录', formatDuration(summary.totalMinutes), 'sage') +
               renderMetricCard('留白', formatDuration(summary.blankMinutes), 'sand') +
@@ -332,10 +325,10 @@
 
   function renderQuickGrid() {
     var items = [
-      { action: 'open-add', mode: 'quick', label: '记录此刻', note: '刚做完一段，马上收下', icon: '●' },
-      { action: 'open-add', mode: 'manual', label: '补记时间', note: '把漏掉的时间补回来', icon: '◌' },
-      { action: 'open-journal', label: '写点什么', note: '留一句当下想法或感受', icon: '✦' },
-      { action: 'open-reminder', label: '提醒一下', note: '把待办轻轻挂在今天', icon: '☑' }
+      { action: 'open-add', mode: 'quick', label: '记录此刻', icon: '●' },
+      { action: 'open-add', mode: 'manual', label: '补记时间', icon: '◌' },
+      { action: 'open-journal', label: '写点什么', icon: '✦' },
+      { action: 'open-reminder', label: '提醒一下', icon: '☑' }
     ];
 
     return '' +
@@ -345,7 +338,6 @@
             '<button class="quick-card" data-action="' + item.action + '"' + (item.mode ? ' data-mode="' + item.mode + '"' : '') + '>' +
               '<div class="quick-icon">' + escapeHtml(item.icon) + '</div>' +
               '<div class="quick-label">' + escapeHtml(item.label) + '</div>' +
-              '<div class="quick-note">' + escapeHtml(item.note) + '</div>' +
             '</button>';
         }).join('') +
       '</section>';
@@ -354,14 +346,11 @@
   function renderMealTeaser(mealSummary) {
     var summaryText = mealSummary.count
       ? '今天已整理 ' + mealSummary.count + ' 餐，约 ' + Math.round(mealSummary.calories) + ' kcal，蛋白质约 ' + Math.round(mealSummary.protein) + 'g'
-      : '饮食页已准备好，后面可以直接把对话里的吃饭内容整理进来。';
+      : '今天还没有饮食记录';
     return '' +
       '<button class="surface-card meal-teaser-card" data-action="switch-view" data-view="food">' +
         '<div class="section-head compact-head">' +
-          '<div>' +
-            '<div class="eyebrow">饮食摘要</div>' +
-            '<h3 class="section-title">热量和蛋白只轻轻看一眼</h3>' +
-          '</div>' +
+          '<h3 class="section-title">饮食</h3>' +
           '<span class="inline-link">去饮食页</span>' +
         '</div>' +
         '<p class="meal-teaser-text">' + escapeHtml(summaryText) + '</p>' +
@@ -372,10 +361,7 @@
     var html =
       '<section class="section">' +
         '<div class="section-head">' +
-          '<div>' +
-            '<div class="eyebrow">今日流动</div>' +
-            '<h3 class="section-title">时间线</h3>' +
-          '</div>' +
+          '<h3 class="section-title">时间线</h3>' +
         '</div>';
 
     if (!events.length) {
@@ -407,10 +393,7 @@
   function renderReminderCard(reminders) {
     var html =
       '<section class="surface-card note-card">' +
-        '<div class="card-headline">' +
-          '<div class="eyebrow">提醒</div>' +
-          '<h3 class="section-title">别忘了的事</h3>' +
-        '</div>';
+        '<h3 class="section-title">提醒</h3>';
     if (!reminders.length) {
       html += '<p class="empty-text">今天还没有提醒。</p>';
     } else {
@@ -431,10 +414,7 @@
   function renderJournalCard(journal) {
     var html =
       '<section class="surface-card note-card">' +
-        '<div class="card-headline">' +
-          '<div class="eyebrow">随想</div>' +
-          '<h3 class="section-title">今天留下的话</h3>' +
-        '</div>';
+        '<h3 class="section-title">随想</h3>';
 
     if (!journal.length) {
       html += '<p class="empty-text">还没有写点什么。</p>';
@@ -458,10 +438,7 @@
   function renderReviewCard(review) {
     var html =
       '<section class="surface-card note-card">' +
-        '<div class="card-headline">' +
-          '<div class="eyebrow">复盘</div>' +
-          '<h3 class="section-title">今天的收束</h3>' +
-        '</div>';
+        '<h3 class="section-title">复盘</h3>';
 
     if (!review) {
       html += '<p class="empty-text">今天还没有复盘。</p>';
@@ -477,16 +454,13 @@
   function renderFoodView(meals, mealSummary) {
     return '' +
       '<section class="surface-card food-hero-card">' +
-        '<div class="card-headline">' +
-          '<div class="eyebrow">饮食页</div>' +
-          '<h2 class="hero-title">轻一点地看热量和蛋白</h2>' +
-        '</div>' +
+        '<h2 class="hero-title">今天饮食</h2>' +
         '<div class="metric-grid food-metric-grid">' +
           renderMetricCard('已记录', mealSummary.count ? mealSummary.count + ' 餐' : '0 餐', 'sage') +
           renderMetricCard('热量', mealSummary.count ? Math.round(mealSummary.calories) + ' kcal' : '待整理', 'sand') +
           renderMetricCard('蛋白质', mealSummary.count ? Math.round(mealSummary.protein) + ' g' : '待整理', 'mist') +
         '</div>' +
-        '<p class="meal-source-note">后续这里会承接 AI 对话整理进来的餐次。首页只放摘要，这一页再展开看细节。</p>' +
+        '<p class="meal-source-note">以后这里接 AI 整理进来的餐次。</p>' +
       '</section>' +
       renderMealList(meals, mealSummary);
   }
@@ -495,7 +469,7 @@
     if (!meals.length) {
       return '' +
         '<section class="surface-card empty-card">' +
-          '<p class="empty-text">今天还没有整理出餐次。等你从对话里给到饮食内容后，这里会自动归成一餐一餐。</p>' +
+          '<p class="empty-text">今天还没有整理出餐次。</p>' +
         '</section>';
     }
 
@@ -549,10 +523,7 @@
   function renderWeekView(weekAggregate) {
     return '' +
       '<section class="surface-card week-hero-card">' +
-        '<div class="card-headline">' +
-          '<div class="eyebrow">本周概览</div>' +
-          '<h2 class="hero-title">把一周的投入先汇总，再看每天</h2>' +
-        '</div>' +
+        '<h2 class="hero-title">本周</h2>' +
         '<div class="metric-grid">' +
           renderMetricCard('总时长', formatDuration(weekAggregate.totalMinutes), 'sage') +
           renderMetricCard('总段数', weekAggregate.totalEvents ? weekAggregate.totalEvents + ' 段' : '0 段', 'mist') +
@@ -566,10 +537,7 @@
   function renderWeekBreakdown(categories, totalMinutes) {
     var html =
       '<section class="surface-card week-breakdown-card">' +
-        '<div class="card-headline">' +
-          '<div class="eyebrow">板块投入</div>' +
-          '<h3 class="section-title">这一周时间都落在哪些地方</h3>' +
-        '</div>';
+        '<h3 class="section-title">投入分布</h3>';
 
     if (!categories.length) {
       html += '<p class="empty-text">这周还没有累计出投入板块。</p>';
@@ -600,10 +568,7 @@
     var html =
       '<section class="section">' +
         '<div class="section-head">' +
-          '<div>' +
-            '<div class="eyebrow">每天</div>' +
-            '<h3 class="section-title">本周钟面</h3>' +
-          '</div>' +
+          '<h3 class="section-title">每天</h3>' +
         '</div>' +
         '<div class="week-grid">';
 
