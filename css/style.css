@@ -924,6 +924,28 @@ button {
   grid-template-columns: 1fr;
 }
 
+.tag-library-item,
+.tag-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tag-library-item .tag-choice {
+  flex: 1 1 auto;
+}
+
+.tag-edit-btn {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(182, 196, 221, 0.18);
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
 .tag-color-dot {
   width: 28px;
   height: 28px;

@@ -447,6 +447,36 @@ var Storage = (function() {
     return tag;
   }
 
+  function updateTag(id, data) {
+    if (!id) return null;
+    var state = readState();
+    var index = state.tagLibrary.findIndex(function(item) {
+      return item.id === id;
+    });
+    if (index < 0) return null;
+
+    var current = normalizeTag(state.tagLibrary[index]);
+    var next = normalizeTag({
+      id: current.id,
+      text: data && data.text ? data.text : current.text,
+      color: data && data.color ? data.color : current.color,
+      createdAt: current.createdAt,
+      updatedAt: new Date().toISOString()
+    });
+    if (!next) return null;
+
+    state.tagLibrary[index] = next;
+    state.tagLibrary = sortTags(state.tagLibrary.map(normalizeTag).filter(Boolean));
+    state.events = (state.events || []).map(function(event) {
+      event.tags = (event.tags || []).map(function(tag) {
+        return tag.id === id ? next : normalizeTag(tag);
+      }).filter(Boolean);
+      return event;
+    });
+    saveState(state);
+    return next;
+  }
+
   function mergeTagsIntoLibrary(state, tags) {
     var map = buildTagMap((state.tagLibrary || []).map(normalizeTag).filter(Boolean));
     tags.forEach(function(tag) {
@@ -766,6 +796,7 @@ var Storage = (function() {
     createReview: createReview,
     getTagLibrary: getTagLibrary,
     createTag: createTag,
+    updateTag: updateTag,
     getMealsByDay: getMealsByDay,
     getMealSummaryByDay: getMealSummaryByDay,
     createMeal: createMeal,

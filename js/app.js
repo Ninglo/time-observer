@@ -1,5 +1,5 @@
 (function() {
-  var BUILD_VERSION = '2026.04.05b';
+  var BUILD_VERSION = '2026.04.05c';
   var CUSTOM_ACTIVITY_STORAGE_KEY = 'time_observer_custom_activities_v1';
 
   var ACTIVITY_OPTIONS = [
@@ -107,6 +107,7 @@
       note: '',
       noteOpen: false,
       selectedTagIds: [],
+      editingTagId: '',
       newTagText: '',
       newTagColor: TAG_COLOR_GROUPS[0].colors[0].value
     };
@@ -854,11 +855,15 @@
         '<div class="chip-grid tag-library-grid" id="tag-library">' +
           tagLibrary.map(function(tag) {
             var selected = addFormState.selectedTagIds.indexOf(tag.id) >= 0 ? ' is-selected' : '';
-            return '<button type="button" class="choice-chip tag-choice' + selected + '" data-tag-id="' + escapeHtml(tag.id) + '" style="--chip-bg:' + mixHex(tag.color, '#ffffff', 0.84) + '; --chip-text:' + tag.color + ';">' + escapeHtml(tag.text) + '</button>';
+            return '' +
+              '<div class="tag-library-item">' +
+                '<button type="button" class="choice-chip tag-choice' + selected + '" data-tag-id="' + escapeHtml(tag.id) + '" style="--chip-bg:' + mixHex(tag.color, '#ffffff', 0.84) + '; --chip-text:' + tag.color + ';">' + escapeHtml(tag.text) + '</button>' +
+                '<button type="button" class="tag-edit-btn" data-edit-tag-id="' + escapeHtml(tag.id) + '" aria-label="修改标签">改</button>' +
+              '</div>';
           }).join('') +
         '</div>' +
         '<div class="custom-tag-builder">' +
-          '<input class="text-input" id="custom-tag-text" type="text" maxlength="10" placeholder="新建标签文字" value="' + escapeHtml(addFormState.newTagText) + '">' +
+          '<input class="text-input" id="custom-tag-text" type="text" maxlength="10" placeholder="' + escapeHtml(addFormState.editingTagId ? '修改标签文字' : '新建标签文字') + '" value="' + escapeHtml(addFormState.newTagText) + '">' +
           '<div class="tag-palette-stack" id="tag-color-palette">' +
             TAG_COLOR_GROUPS.map(function(group) {
               return '' +
@@ -872,7 +877,10 @@
                 '</div>';
             }).join('') +
           '</div>' +
-          '<button type="button" class="btn btn-soft" id="add-custom-tag">保存这个标签</button>' +
+          '<div class="tag-editor-actions">' +
+            '<button type="button" class="btn btn-soft" id="add-custom-tag">' + escapeHtml(addFormState.editingTagId ? '保存修改' : '保存这个标签') + '</button>' +
+            (addFormState.editingTagId ? '<button type="button" class="btn btn-secondary" id="cancel-tag-edit">取消修改</button>' : '') +
+          '</div>' +
         '</div>' +
       '</div>';
   }
@@ -889,7 +897,8 @@
     return getAllActivityOptions().map(function(option) {
       var meta = getActivityMeta(option.value);
       var selected = addFormState.activity === option.value ? ' is-selected' : '';
-      return '<button type="button" class="choice-chip' + selected + '" data-activity="' + option.value + '" style="--chip-bg:' + meta.soft + '; --chip-text:' + meta.color + ';">' + escapeHtml(meta.icon + ' ' + option.label) + '</button>';
+      var text = meta.icon ? (meta.icon + ' ' + option.label) : option.label;
+      return '<button type="button" class="choice-chip' + selected + '" data-activity="' + option.value + '" style="--chip-bg:' + meta.soft + '; --chip-text:' + meta.color + ';">' + escapeHtml(text) + '</button>';
     }).join('');
   }
 
@@ -955,6 +964,11 @@
     });
 
     document.getElementById('tag-library').addEventListener('click', function(event) {
+      var editTarget = event.target.closest('[data-edit-tag-id]');
+      if (editTarget) {
+        startEditingTag(editTarget.getAttribute('data-edit-tag-id'));
+        return;
+      }
       var target = event.target.closest('[data-tag-id]');
       if (!target) return;
       toggleSelectedTag(target.getAttribute('data-tag-id'));
@@ -978,15 +992,27 @@
         showToast('先写标签文字');
         return;
       }
-      var created = Storage.createTag({ text: text, color: addFormState.newTagColor });
+      var isEditing = !!addFormState.editingTagId;
+      var created = isEditing
+        ? Storage.updateTag(addFormState.editingTagId, { text: text, color: addFormState.newTagColor })
+        : Storage.createTag({ text: text, color: addFormState.newTagColor });
       if (created && addFormState.selectedTagIds.indexOf(created.id) === -1) {
         addFormState.selectedTagIds.push(created.id);
       }
-      addFormState.newTagText = '';
+      resetTagEditor();
       setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
       bindAddFormEvents();
-      showToast('标签已保存');
+      showToast(isEditing ? '标签已更新' : '标签已保存');
     });
+
+    var cancelTagEdit = document.getElementById('cancel-tag-edit');
+    if (cancelTagEdit) {
+      cancelTagEdit.addEventListener('click', function() {
+        resetTagEditor();
+        setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
+        bindAddFormEvents();
+      });
+    }
 
     if (addFormState.mode === 'quick') {
       document.getElementById('duration-grid').addEventListener('click', function(event) {
@@ -1037,6 +1063,24 @@
     } else {
       addFormState.selectedTagIds.push(tagId);
     }
+  }
+
+  function startEditingTag(tagId) {
+    var tag = Storage.getTagLibrary().find(function(item) {
+      return item.id === tagId;
+    });
+    if (!tag) return;
+    addFormState.editingTagId = tag.id;
+    addFormState.newTagText = tag.text;
+    addFormState.newTagColor = tag.color;
+    setModal(addFormState.mode === 'manual' ? '补记时间' : '记录此刻', renderAddForm());
+    bindAddFormEvents();
+  }
+
+  function resetTagEditor() {
+    addFormState.editingTagId = '';
+    addFormState.newTagText = '';
+    addFormState.newTagColor = TAG_COLOR_GROUPS[0].colors[0].value;
   }
 
   function submitAddForm(strategy) {
@@ -1182,7 +1226,7 @@
             var label = String(item.label || '').trim();
             var value = String(item.value || '').trim();
             if (!label || !value) return null;
-            return { value: value, label: label, icon: '签' };
+            return { value: value, label: label, icon: '' };
           }).filter(Boolean)
         : [];
     } catch (error) {
@@ -1195,7 +1239,7 @@
     var value = 'custom_' + trimmed.toLowerCase().replace(/\s+/g, '_');
     var activities = readCustomActivities();
     if (!activities.some(function(item) { return item.value === value; })) {
-      activities.push({ value: value, label: trimmed, icon: '签' });
+      activities.push({ value: value, label: trimmed, icon: '' });
       localStorage.setItem(CUSTOM_ACTIVITY_STORAGE_KEY, JSON.stringify(activities));
     }
     return value;
