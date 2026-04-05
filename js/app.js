@@ -346,7 +346,7 @@
   function renderMealTeaser(mealSummary) {
     var summaryText = mealSummary.count
       ? '今天已整理 ' + mealSummary.count + ' 餐，约 ' + Math.round(mealSummary.calories) + ' kcal，蛋白质约 ' + Math.round(mealSummary.protein) + 'g'
-      : '今天还没有饮食记录';
+      : '暂无饮食记录';
     return '' +
       '<button class="surface-card meal-teaser-card" data-action="switch-view" data-view="food">' +
         '<div class="section-head compact-head">' +
@@ -395,7 +395,7 @@
       '<section class="surface-card note-card">' +
         '<h3 class="section-title">提醒</h3>';
     if (!reminders.length) {
-      html += '<p class="empty-text">今天还没有提醒。</p>';
+      html += '<p class="empty-text">暂无</p>';
     } else {
       html += '<div class="reminder-list">';
       reminders.forEach(function(item) {
@@ -417,7 +417,7 @@
         '<h3 class="section-title">随想</h3>';
 
     if (!journal.length) {
-      html += '<p class="empty-text">还没有写点什么。</p>';
+      html += '<p class="empty-text">暂无</p>';
     } else {
       html += '<div class="journal-list">';
       journal.forEach(function(item) {
@@ -441,7 +441,7 @@
         '<h3 class="section-title">复盘</h3>';
 
     if (!review) {
-      html += '<p class="empty-text">今天还没有复盘。</p>';
+      html += '<p class="empty-text">暂无</p>';
     } else {
       if (review.summary) html += '<p class="review-text">' + escapeHtml(review.summary) + '</p>';
       if (review.highlights) html += '<p class="review-highlight">' + escapeHtml(review.highlights) + '</p>';
@@ -460,7 +460,6 @@
           renderMetricCard('热量', mealSummary.count ? Math.round(mealSummary.calories) + ' kcal' : '待整理', 'sand') +
           renderMetricCard('蛋白质', mealSummary.count ? Math.round(mealSummary.protein) + ' g' : '待整理', 'mist') +
         '</div>' +
-        '<p class="meal-source-note">以后这里接 AI 整理进来的餐次。</p>' +
       '</section>' +
       renderMealList(meals, mealSummary);
   }
@@ -469,7 +468,7 @@
     if (!meals.length) {
       return '' +
         '<section class="surface-card empty-card">' +
-          '<p class="empty-text">今天还没有整理出餐次。</p>' +
+          '<p class="empty-text">暂无饮食记录</p>' +
         '</section>';
     }
 
@@ -540,7 +539,7 @@
         '<h3 class="section-title">投入分布</h3>';
 
     if (!categories.length) {
-      html += '<p class="empty-text">这周还没有累计出投入板块。</p>';
+      html += '<p class="empty-text">暂无</p>';
     } else {
       html += '<div class="week-breakdown-list">';
       categories.forEach(function(item) {

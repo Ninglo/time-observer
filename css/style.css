@@ -213,11 +213,11 @@ button {
 }
 
 .hero-title {
-  font-size: clamp(24px, 5vw, 34px);
+  font-size: clamp(22px, 4.6vw, 30px);
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .hero-caption,
@@ -312,7 +312,7 @@ button {
 }
 
 .hero-summary-line {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-soft);
 }
 
@@ -435,8 +435,8 @@ button {
 
 .quick-card {
   text-align: left;
-  min-height: 88px;
-  padding: 14px;
+  min-height: 72px;
+  padding: 12px;
   border-radius: var(--radius-md);
   background: var(--surface-strong);
   border: 1px solid var(--border);
@@ -457,8 +457,8 @@ button {
 }
 
 .quick-label {
-  margin-top: 10px;
-  font-size: 15px;
+  margin-top: 8px;
+  font-size: 14px;
   color: var(--text);
 }
 
@@ -473,7 +473,7 @@ button {
 }
 
 .event-card {
-  padding: 16px;
+  padding: 14px;
 }
 
 .event-main {
@@ -1015,7 +1015,7 @@ button {
   .meal-card,
   .note-card,
   .meal-teaser-card {
-    padding: 16px;
+    padding: 14px;
   }
 
   .hero-clock-layout,
@@ -1101,12 +1101,12 @@ button {
   }
 
   .quick-label {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .quick-card {
-    min-height: 80px;
-    padding: 12px;
+    min-height: 68px;
+    padding: 10px;
   }
 
   .meal-source-note,
@@ -1126,7 +1126,7 @@ button {
 
   .food-hero-card .hero-title,
   .week-hero-card .hero-title {
-    font-size: 30px;
+    font-size: 26px;
   }
 
   .week-card {
@@ -1166,7 +1166,7 @@ button {
   }
 
   .empty-card {
-    padding: 18px;
+    padding: 12px;
   }
 
   .meal-item-row {
